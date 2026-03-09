@@ -1,0 +1,11 @@
+R_DEF: Internal format may change without notice
+local
+color brand_bg
+color brand_orange
+color splash_bg
+drawable ic_splash_logo
+id webView
+layout activity_main
+string app_name
+style Theme.SurpriseBox
+style Theme.SurpriseBox.Splash

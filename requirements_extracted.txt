@@ -1,0 +1,3210 @@
+🚀SurpriseBox App - Complete Development Specification
+Product Requirements Document (PRD)
+Version: 1.0Date: March 2026Product:SurpriseBox - Food Surplus MarketplaceInspiration: Too Good To GoTarget Market: Hubli-Dharwad, India
+
+📋 TABLE OF CONTENTS
+Executive Summary
+User Personas
+User Flows
+Feature Specifications
+Screen-by-Screen Breakdown
+Technical Architecture
+Design Guidelines
+Development Phases
+API Specifications
+Database Schema
+
+1. EXECUTIVE SUMMARY
+1.1 Product Vision
+Mission Statement:"Make quality food accessible and affordable while reducing food waste in India's tier-2 cities."
+Product Description:A mobile marketplace connecting restaurants with surplus fresh food to customers looking for affordable meals. Customers purchase "Surprise Boxes" at 60-70% discount without knowing exact contents, pickup same evening.
+Key Differentiators:
+WhatsApp-first MVP, then native app
+Pickup-only (no delivery overhead)
+Mystery box gamification
+Hyperlocal focus (Hubli-first)
+Lower commission than competitors (20-30% vs 35-40%)
+
+1.2 Success Metrics
+Customer Metrics:
+Monthly Active Users (MAU): Target 5,000 by Month 6
+Repeat purchase rate: >40%
+Average orders per user per month: 2-3
+Customer acquisition cost: <₹50
+Net Promoter Score: >50
+Restaurant Metrics:
+Active restaurant partners: 50 by Month 6
+Average boxes per restaurant per day: 8-10
+Restaurant retention rate: >80%
+Average revenue per restaurant: ₹20,000/month
+Business Metrics:
+Gross Merchandise Value (GMV): ₹10L by Month 6
+Take rate: 25-30%
+Monthly revenue: ₹2.5L-3L by Month 6
+Unit economics: Positive by Month 3
+
+2. USER PERSONAS
+2.1 Primary Persona - The Budget-Conscious Foodie
+Name: Priya (Age 24)Occupation: Software Engineer at local IT companyIncome: ₹35,000/monthLocation: Vidyanagar, Hubli
+Goals:
+Eat variety without overspending
+Try different restaurants
+Avoid cooking after work
+Find convenient dinner options
+Pain Points:
+Regular restaurant prices too high for daily use
+Bored of home cooking
+Zomato delivery charges add up
+Limited budget for food (~₹4,000/month)
+Behavior:
+Smartphone-savvy, uses apps daily
+Active on Instagram, WhatsApp
+Values deals and discounts
+Willing to compromise on choice for price
+Motivation to Use SurpriseBox:
+Save ₹100-150 per meal
+Excitement of "what will I get?"
+Supports local restaurants
+Eco-conscious (reducing waste appeals)
+
+2.2 Secondary Persona - The College Student
+Name: Rohan (Age 20)Occupation: Engineering student at BVBIncome: ₹5,000/month pocket moneyLocation: Near BVB campus
+Goals:
+Maximize food on limited budget
+Break from hostel food
+Social activity (picking up boxes with friends)
+Pain Points:
+Very limited budget
+Hostel food monotonous
+Can't afford restaurants often
+Behavior:
+Highly price-sensitive
+Influenced by peers
+Active on social media
+Seeks experiences over predictability
+
+2.3 Tertiary Persona - The Busy Parent
+Name: Anjali (Age 35)Occupation: School teacherIncome: ₹50,000/month (household)Location:Unkal, Hubli
+Goals:
+Quick dinner solution on busy days
+Feed family affordably
+Variety for kids
+Pain Points:
+No time to cook after work some days
+Ordering for family of 4 expensive
+Kids bored of same food
+Behavior:
+Uses WhatsApp primarily
+Less tech-savvy than younger users
+Values convenience and trust
+Needs reassurance on quality
+
+2.4 Restaurant Partner Persona
+Name: Rajesh (Age 42)Occupation: Owner, Pizza CornerBusiness: Small pizza outletDaily Production: 100 pizzas
+Goals:
+Reduce daily waste (15-20 pizzas unsold)
+Generate extra revenue
+Acquire new customers
+Minimize operational overhead
+Pain Points:
+Unpredictable demand
+Can't sell day-old items
+Giving to staff = ₹0 revenue
+Self-marketing too time-consuming
+Technical Comfort:
+Uses smartphone for WhatsApp, basic apps
+Not tech-expert but willing to learn simple tools
+Busy during peak hours, needs quick interface
+Motivation to Partner:
+Guaranteed ₹500-1,000 extra daily
+New customer discovery
+Zero upfront cost
+Minimal time investment
+
+3. USER FLOWS
+3.1 Customer User Flow - First Time Purchase
+START: User hears about app from friend
+│
+├─> STEP 1: Download App (iOS/Android)
+│   │
+│   └─> Splash Screen (2 sec)
+│       └─> Onboarding Carousel (3 screens)
+│           ├─> Screen 1: "Save 60-70% on food"
+│           ├─> Screen 2: "Fresh today, pick up tonight"
+│           └─> Screen 3: "Support local, reduce waste"
+│
+├─> STEP 2: Sign Up
+│   │
+│   ├─> Enter Phone Number
+│   ├─> Receive OTP (WhatsApp/SMS)
+│   ├─> Verify OTP
+│   ├─> Enter Name
+│   ├─> Allow Location Access (for nearby boxes)
+│   └─> Sign Up Complete
+│
+├─> STEP 3: Browse Available Boxes
+│   │
+│   ├─> Home Screen shows:
+│   │   ├─> Current location (Vidyanagar)
+│   │   ├─> Available boxes count (8 boxes near you)
+│   │   └─> List of boxes:
+│   │       ├─> Box Card 1: Pizza Corner
+│   │       │   ├─> Photo (pizza image)
+│   │       │   ├─> "Surprise Box - ₹99"
+│   │       │   ├─> "Worth ₹300+"
+│   │       │   ├─> "3 boxes left"
+│   │       │   ├─> Distance: "1.2 km away"
+│   │       │   ├─> Pickup: "8:00-9:00 PM"
+│   │       │   └─> Restaurant rating: 4.5⭐
+│   │       │
+│   │       └─> Box Card 2: Sweet Delights
+│   │           └─> [Similar structure]
+│   │
+│   └─> User taps on "Pizza Corner" box
+│
+├─> STEP 4: Box Details Screen
+│   │
+│   ├─> Restaurant header:
+│   │   ├─> Pizza Corner logo/photo
+│   │   ├─> 4.5⭐ (125 reviews)
+│   │   └─> "Italian, Fast Food"
+│   │
+│   ├─> Box details:
+│   │   ├─> Large food photo
+│   │   ├─> "Surprise Box - ₹99"
+│   │   ├─> Regular value: "₹300-350"
+│   │   ├─> "You save: ₹200+"
+│   │   ├─> "What might be inside?"
+│   │   │   └─> "Pizza slices, garlic bread, pasta, dessert"
+│   │   ├─> "Made fresh today ✓"
+│   │   └─> Allergen info: "Contains: Gluten, Dairy"
+│   │
+│   ├─> Pickup details:
+│   │   ├─> "Pickup Today: 8:00-9:00 PM"
+│   │   ├─> Address: "Camp Road, opp. HDFC Bank"
+│   │   ├─> Map view (Google Maps integration)
+│   │   └─> "1.2 km away" + Get Directions button
+│   │
+│   ├─> "3 boxes left" (real-time counter)
+│   │
+│   └─> CTA Button: "Reserve for ₹99"
+│
+├─> STEP 5: Reserve Box
+│   │
+│   ├─> Tap "Reserve for ₹99"
+│   ├─> Bottom Sheet appears:
+│   │   ├─> "Confirm Reservation"
+│   │   ├─> Box: Pizza Corner Surprise - ₹99
+│   │   ├─> Pickup: Today 8-9 PM
+│   │   ├─> "You'll pay at pickup (cash only)"
+│   │   ├─> Checkbox: "I agree to pickup within time slot"
+│   │   └─> Button: "Confirm Reservation"
+│   │
+│   └─> User taps "Confirm"
+│
+├─> STEP 6: Reservation Confirmed
+│   │
+│   ├─> Success animation (✓ checkmark)
+│   ├─> "Reservation Confirmed!" message
+│   ├─> Reservation details:
+│   │   ├─> Reservation code: "SB-1234"
+│   │   ├─> "Show this code at pickup"
+│   │   ├─> QR Code (for restaurant to scan)
+│   │   ├─> Pickup: Today 8-9 PM
+│   │   ├─> Address + Get Directions button
+│   │   └─> "Set reminder" toggle
+│   │
+│   ├─> WhatsApp notification sent:
+│   │   "Your Pizza Corner box is reserved!
+│   │    Pickup: 8-9 PM today
+│   │    Address: Camp Road, opp HDFC
+│   │    Code: SB-1234"
+│   │
+│   └─> Button: "View My Reservations"
+│
+├─> STEP 7: Pre-Pickup (1 hour before)
+│   │
+│   ├─> Push notification:
+│   │   "Reminder: Pick up your box in 1 hour!"
+│   │   "Pizza Corner, 8-9 PM"
+│   │
+│   └─> User can:
+│       ├─> Get directions
+│       ├─> Call restaurant
+│       └─> Cancel (up to 2 hours before pickup)
+│
+├─> STEP 8: Pickup
+│   │
+│   ├─> User arrives at restaurant
+│   ├─> Shows QR code / Says code "SB-1234"
+│   ├─> Staff scans OR enters code
+│   ├─> Staff hands over surprise box
+│   ├─> User pays ₹99 cash
+│   └─> Status updated to "Picked Up"
+│
+└─> STEP 9: Post-Pickup
+    │
+├─> In-app notification (30 min after pickup):
+    │   "How was your surprise box?"
+    │
+├─> Rating Screen:
+    │   ├─> "Rate your experience"
+    │   ├─> Star rating (1-5)
+    │   ├─> "What did you get?" (optional photo upload)
+    │   ├─> Quick tags: "Great value" "Fresh" "Good quantity"
+    │   └─> Text feedback (optional)
+    │
+├─> Submit rating
+    │
+    └─> Rewards screen:
+        "Thank you! You've earned 10 points"
+        "2 more purchases = Free box!"
+
+END
+
+3.2 Customer User Flow - Repeat Purchase
+START: User opens app (already logged in)
+│
+├─> Home Screen
+│   ├─> Personalized greeting: "Hi Priya! 👋"
+│   ├─> "8 boxes available near you"
+│   ├─> Recommended box highlighted: "You loved this last time!"
+│   └─> Browse boxes
+│
+├─> Reserve box (same as first-time, steps 4-6)
+│
+└─> Faster flow:
+├─> No location permission needed (already saved)
+├─> Autofill payment preference
+    └─> One-tap reservation
+
+END
+
+3.3 Restaurant Partner Flow - Daily Listing
+START: Restaurant partner logs into Partner App
+│
+├─> STEP 1: Login
+│   ├─> Enter phone number
+│   ├─> OTP verification
+│   └─> Dashboard opens
+│
+├─> STEP 2: Dashboard View
+│   │
+│   ├─> Today's Summary:
+│   │   ├─> Boxes listed today: 5
+│   │   ├─> Boxes sold: 3
+│   │   ├─> Revenue earned: ₹210 (commission deducted)
+│   │   └─> Pending pickups: 0
+│   │
+│   ├─> Quick Actions:
+│   │   ├─> "List boxes for today" button (prominent)
+│   │   ├─> "View reservations"
+│   │   └─> "View earnings"
+│   │
+│   └─> Notifications:
+│       └─> "Reminder: List today's boxes by 4 PM"
+│
+├─> STEP 3: List Boxes (Daily - before 4 PM)
+│   │
+│   ├─> Tap "List boxes for today"
+│   ├─> Simple form:
+│   │   │
+│   │   ├─> "How many boxes today?"
+│   │   │   └─> Number picker: [1] [2] [3] [4] [5] [+]
+│   │   │
+│   │   ├─> "What might be inside?" (optional)
+│   │   │   └─> Text field: "Pizza slices, garlic bread, pasta"
+│   │   │
+│   │   ├─> "Pickup time:"
+│   │   │   └─> Default: 8:00-9:00 PM (editable)
+│   │   │
+│   │   └─> "Price:"
+│   │       ├─> Recommended: ₹99 (worth ₹300)
+│   │       └─> Editable slider: ₹80-120
+│   │
+│   ├─> Preview:
+│   │   "Your listing will show:
+│   │    5 Surprise Boxes - ₹99 each
+│   │    Pickup: 8-9 PM
+│   │    You'll receive: ₹70 per box (₹350 total)"
+│   │
+│   └─> Button: "List Boxes"
+│
+├─> STEP 4: Listing Published
+│   │
+│   ├─> Success message: "Boxes listed! ✓"
+│   ├─> "Customers can now see your boxes"
+│   ├─> Real-time counter: "2 boxes reserved so far!"
+│   │
+│   └─> Can edit/cancel until first reservation
+│
+├─> STEP 5: Reservations Come In
+│   │
+│   ├─> Push notification (each reservation):
+│   │   "New reservation! SB-1234
+│   │    Pickup: 8:15 PM
+│   │    1 box"
+│   │
+│   ├─> View Reservations screen:
+│   │   │
+│   │   ├─> Active Reservations (3)
+│   │   │   │
+│   │   │   ├─> Card 1:
+│   │   │   │   ├─> Code: SB-1234
+│   │   │   │   ├─> Customer: Priya M.
+│   │   │   │   ├─> Pickup: 8:15 PM (expected)
+│   │   │   │   ├─> Status: Waiting
+│   │   │   │   └─> Actions: Call | Mark as Picked Up
+│   │   │   │
+│   │   │   └─> [Similar cards for other reservations]
+│   │   │
+│   │   └─> Completed Pickups (2)
+│   │       └─> [Past pickups, greyed out]
+│   │
+│   └─> Stats shown:
+│       "3 boxes reserved, 2 available"
+│
+├─> STEP 6: Customer Arrives for Pickup
+│   │
+│   ├─> Customer shows QR code / says code
+│   │
+│   ├─> Staff scans QR OR enters code manually:
+│   │   ├─> Tap reservation card
+│   │   ├─> "Scan QR" button
+│   │   ├─> OR "Enter code" → SB-1234
+│   │   └─> Code verified ✓
+│   │
+│   ├─> Confirmation screen:
+│   │   ├─> "Priya M. - 1 box"
+│   │   ├─> "Collect ₹99 cash"
+│   │   └─> "Hand over surprise box"
+│   │
+│   ├─> Staff taps "Mark as Picked Up"
+│   │
+│   └─> Status updated:
+│       "Pickup completed! ✓
+│        ₹70 added to your earnings"
+│
+├─> STEP 7: End of Day
+│   │
+│   ├─> Automatic summary generated (9:30 PM):
+│   │   │
+│   │   ├─> Today's Results:
+│   │   │   ├─> Listed: 5 boxes
+│   │   │   ├─> Sold: 4 boxes
+│   │   │   ├─> Picked up: 4 boxes
+│   │   │   ├─> No-shows: 0
+│   │   │   ├─> Revenue: ₹280 (after commission)
+│   │   │   └─> Performance: "Great! 80% sold"
+│   │   │
+│   │   └─> "Earnings will be paid on [next Friday]"
+│   │
+│   └─> Feedback prompt:
+│       "Any issues today? Let us know!"
+│
+└─> STEP 8: Weekly Payment
+    │
+├─> Every Friday:
+    │   ├─> "Payment Received! ₹1,960"
+    │   ├─> Breakdown shown:
+    │   │   ├─> Mon: ₹280
+    │   │   ├─> Tue: ₹350
+    │   │   ├─> Wed: ₹420
+    │   │   ├─> Thu: ₹490
+    │   │   ├─> Fri: ₹420
+    │   │   └─> Total: ₹1,960
+    │   │
+    │   └─> UPI transfer confirmation
+    │
+    └─> Monthly analytics:
+        "This month: ₹8,400 extra revenue!
+         28 boxes sold
+         4.6⭐ average rating"
+
+END
+
+3.4 Edge Case Flows
+3.4.1 Customer Cancellation Flow
+Customer wants to cancel reservation
+│
+├─> Opens "My Reservations"
+├─> Taps on active reservation
+├─> "Cancel Reservation" button
+│
+├─> If >2 hours before pickup:
+│   ├─> "Are you sure?" confirmation
+│   ├─> User confirms
+│   ├─> Reservation cancelled
+│   ├─> Box becomes available again
+│   ├─> Restaurant notified
+│   └─> No penalty
+│
+├─> If <2 hours before pickup:
+│   ├─> Warning: "Cancellation fee ₹20 applies"
+│   ├─> "Still cancel?"
+│   ├─> If yes:
+│   │   ├─> ₹20 deducted from wallet/next purchase
+│   │   ├─> Reservation cancelled
+│   │   └─> Restaurant compensated
+│   └─> If no:
+│       └─> Returns to reservation details
+│
+└─> If customer no-shows:
+├─> Restaurant marks "No-show" after 30 min grace period
+├─> Customer account flagged
+├─> After 3 no-shows:
+    │   └─> Requires ₹50 advance deposit for future reservations
+    └─> Can appeal/explain via support
+
+END
+
+3.4.2 Restaurant Out-of-Stock Flow
+All boxes sold out earlier than expected
+│
+├─> Restaurant taps "Mark as Sold Out"
+│
+├─> Confirmation:
+│   "Mark all remaining boxes as sold out?
+│    2 boxes still available"
+│
+├─> Restaurant confirms
+│
+├─> Listings automatically hidden from customers
+│
+├─> Customers who had reservations:
+│   └─> Unaffected (their boxes guaranteed)
+│
+└─> Dashboard updated:
+    "5/5 boxes sold! Great job! 🎉"
+
+END
+
+3.4.3 Quality Issue / Customer Complaint Flow
+Customer receives box, unhappy with quality
+│
+├─> Opens reservation in "My Orders"
+├─> Taps "Report Issue"
+│
+├─> Issue selection:
+│   ├─> [ ] Food was not fresh
+│   ├─> [ ] Quantity too small
+│   ├─> [ ] Wrong restaurant/mix-up
+│   ├─> [ ] Other (describe)
+│
+├─> Customer selects + optional photo upload
+├─> Submit report
+│
+├─> Automatic response:
+│   "We're sorry! Our team will review within 24 hours.
+│    Meanwhile, here's ₹50 credit for your next order."
+│
+├─> Admin reviews:
+│   ├─> Checks customer history (serial complainer?)
+│   ├─> Checks restaurant history (pattern?)
+│   ├─> Views photo if uploaded
+│   │
+│   └─> Decision:
+│       │
+│       ├─> If valid complaint:
+│       │   ├─> Full refund (₹99 credit)
+│       │   ├─> Restaurant warned/coached
+│       │   └─> Customer thanked
+│       │
+│       └─> If fraudulent:
+│           ├─> No additional credit
+│           └─> Customer account noted
+│
+└─> Follow-up after 7 days:
+    "Hi! Did our ₹50 credit help?
+     Would you give us another try?"
+
+END
+
+4. FEATURE SPECIFICATIONS
+4.1 MUST-HAVE Features (MVP - Month 1-2)
+4.1.1 User Authentication
+Phone-based signup (OTP via SMS/WhatsApp)
+Simple profile: Name, Phone, Location
+No password required (OTP for login)
+Session management: Stay logged in for 30 days
+Acceptance Criteria:
+User can sign up with phone number in <60 seconds
+OTP received within 30 seconds
+User remains logged in across app restarts
+Logout option available in settings
+
+4.1.2 Browse Boxes
+Home feed: List of available boxes near user
+Real-time availability: Updates every 30 seconds
+Filter by: 
+Distance (1km, 2km, 5km, all)
+Cuisine type (Italian, Indian, Bakery, etc.)
+Price range (₹50-80, ₹80-100, ₹100+)
+Sort by: 
+Distance (nearest first)
+Price (low to high)
+Rating (highest first)
+Newest listings
+Box Card displays:
+Restaurant name + logo
+"Surprise Box - ₹XX"
+Regular value ("Worth ₹YY")
+"X boxes left"
+Distance from user
+Pickup time window
+Restaurant rating (stars)
+Cuisine type tags
+Acceptance Criteria:
+User sees boxes within 5km by default
+Filters work instantly (<1 sec response)
+Availability counter updates in real-time
+No boxes shown after pickup time ends
+Sold-out boxes automatically hidden
+
+4.1.3 Box Details & Reservation
+Detailed view when user taps box card
+Information shown:
+Large food photo (appealing stock image)
+Restaurant details (name, rating, cuisine)
+Price + savings calculation
+"What might be inside" description
+Pickup time + address
+Map with "Get Directions" button
+Allergen info
+Terms: "Pay cash at pickup"
+Reserve button (prominent CTA)
+Reservation confirmation bottom sheet
+QR code generation for pickup
+Acceptance Criteria:
+All info visible without scrolling (key details)
+Map shows correct restaurant location
+"Get Directions" opens Google Maps
+Reservation flow <30 seconds
+QR code scannable by partner app
+Confirmation sent via WhatsApp within 10 sec
+
+4.1.4 My Reservations
+Active reservations tab 
+Shows upcoming pickups
+Each card displays: 
+Restaurant name
+Pickup time + countdown ("Pick up in 2 hrs")
+Address + directions button
+QR code (expandable)
+Reservation code (SB-XXXX)
+"Cancel reservation" option
+Past orders tab 
+History of completed pickups
+Each shows: 
+Restaurant name
+Date picked up
+Amount paid
+"Rate this box" (if not rated)
+Photo user uploaded (if any)
+Acceptance Criteria:
+Active reservations always on top
+Push notification 1 hour before pickup
+Can cancel >2 hours before without penalty
+Past orders load quickly (pagination if >20)
+Clear visual distinction between active/past
+
+4.1.5 Ratings & Reviews
+Post-pickup rating prompt (30 min after pickup time)
+Rating components:
+Star rating (1-5 stars)
+"What did you get?" photo upload (optional)
+Quick tags: "Great value" "Fresh" "Good portion" "Tasty"
+Text review (optional, max 200 chars)
+Restaurant rating aggregation
+Average shown on box cards
+Detailed breakdown on restaurant profile
+User can view their own past ratings
+Acceptance Criteria:
+Rating prompt appears automatically
+Can skip/rate later
+Photo upload works (max 5MB)
+Ratings visible to other users within 5 min
+Restaurant sees ratings in partner app
+
+4.1.6 Notifications
+Push notifications:
+"New boxes available near you!" (4 PM daily)
+"Reservation confirmed" (immediate)
+"Reminder: Pickup in 1 hour"
+"Rate your experience"
+"Special offer from [Restaurant]"
+In-app notifications:
+Updates on reservation status
+Earnings/rewards milestones
+WhatsApp notifications (critical only): 
+Reservation confirmation
+Reminder 1 hour before
+Changes to pickup time
+Acceptance Criteria:
+User can enable/disable each notification type
+Push notifications delivered within 30 sec
+WhatsApp messages use template format
+No spam (max 2 marketing notifications/week)
+Notifications deep-link to relevant screen
+
+4.1.7 Restaurant Partner App (Separate App)
+Dashboard:
+Today's summary (boxes listed/sold/revenue)
+Quick action: "List boxes for today"
+Upcoming pickups (real-time)
+Earnings this week/month
+List Boxes Flow:
+Simple form: 
+Number of boxes (number picker)
+What's inside (optional text)
+Pickup time (default 8-9 PM)
+Price (slider ₹80-120, recommended ₹99)
+Preview before publishing
+One-tap "List Boxes" button
+Manage Reservations:
+List of today's reservations
+Each shows: Code, Customer name, Time, Status
+Actions: Call customer, Mark picked up, Report no-show
+QR scanner to verify pickups
+Manual code entry option
+Analytics:
+Daily: Boxes sold, revenue, rating
+Weekly: Trends, busiest days
+Monthly: Total earnings, growth
+Acceptance Criteria:
+Restaurant can list boxes in <1 minute
+Real-time sync with customer app
+QR scanner works reliably
+Earnings calculation accurate (after commission)
+Can edit listing before first reservation
+
+4.1.8 Payment Handling (Cash-only MVP)
+Customer: Pays cash at pickup (₹99)
+Restaurant: Receives full amount, pays commission to platform weekly
+Platform: Collects commission via bank transfer/UPI from restaurant
+Transparency: Restaurant sees commission deduction in real-time
+Commission Structure:
+Standard: 30%
+Early partners (first 20): 20%
+High-volume (50+ boxes/month): 25%
+Acceptance Criteria:
+Customer sees "Pay cash at pickup" clearly
+Restaurant receives payment breakdown
+Weekly payment run every Friday
+Invoice/receipt generated automatically
+Dispute resolution process defined
+
+4.2 SHOULD-HAVE Features (Month 3-4)
+4.2.1 In-App Wallet
+Load money via UPI/Cards
+Pay from wallet at pickup (QR code)
+Earn cashback: 5% back to wallet
+Referral rewards: ₹50 for referrer + referee
+Why later: Adds complexity, cash works fine initially
+
+4.2.2 Favorites & Preferences
+Save favorite restaurants
+Notification when favorite lists boxes
+Dietary preferences: Veg only, No gluten, etc.
+Cuisine preferences: Show Italian first, hide Chinese
+Why later: Personalization valuable but not critical for MVP
+
+4.2.3 Social Features
+Share unboxing photos to social media
+Referral program: Share code, both get credit
+Leaderboard: Top savers of the month
+Challenge badges: "Tried 10 restaurants", "Saved ₹1000"
+Why later: Engagement booster but needs user base first
+
+4.2.4 Subscription Model
+SurpriseBox Plus: ₹299/month 
+10 boxes/month (₹30/box effective)
+Priority access (book 1 hour early)
+Free delivery (if we add delivery later)
+Exclusive premium boxes
+Family Plan: ₹499/month for 20 boxes
+Why later: Need to prove value first, then upsell
+
+4.2.5 Advanced Search & Discovery
+Map view: See all boxes on map
+"Surprise Me" button: Random box suggestion
+"Tonight's Deal": Best value box highlighted
+Search by restaurant name
+Why later: Nice-to-have, browse works fine initially
+
+4.3 COULD-HAVE Features (Month 6+)
+4.3.1 Delivery Option
+Partner with Dunzo/local delivery
+₹30-50 delivery fee
+Only for users >3km from restaurant
+Why much later: Adds operational complexity, ruins unit economics
+
+4.3.2 Restaurant Analytics Dashboard (Web)
+Detailed charts: Sales trends, peak times
+Customer demographics
+Compare with other restaurants
+Recommendations to optimize listings
+Why much later: Nice for retention but not essential
+
+4.3.3 Corporate/Bulk Orders
+Companies buy boxes for employees
+Bulk discount (20+ boxes)
+Scheduled pickups
+Why much later: Different business model, focus on B2C first
+
+4.3.4 Gamification & Rewards
+Points system (10 points per purchase)
+Levels: Bronze, Silver, Gold
+Rewards: Free boxes, merch, partner discounts
+Spin-the-wheel for random rewards
+Why much later: Retention tool, needs engaged user base
+
+5. SCREEN-BY-SCREEN BREAKDOWN
+5.1 Customer App Screens
+Screen 1: Splash Screen
+Purpose: Brand intro, check login status
+┌─────────────────────────┐
+│                         │
+│         🎁              │
+│                         │
+│    SurpriseBox          │
+│                         │
+│   Fresh food,           │
+│   surprise savings      │
+│                         │
+│   [Loading animation]   │
+│                         │
+│                         │
+└─────────────────────────┘
+Elements:
+Logo (large, centered)
+Tagline
+Loading indicator
+Version number (bottom small text)
+Logic:
+Show for 2 seconds
+Check if user logged in: 
+YES → Navigate to Home
+NO → Navigate to Onboarding
+Technical:
+Lottie animation for loading
+Async check: isUserLoggedIn()
+Preload critical assets (fonts, icons)
+
+Screen 2: Onboarding (3-slide carousel)
+Slide 1:
+┌─────────────────────────┐
+│                         │
+│    [Large food image]   │
+│    🍕🍰🍛               │
+│                         │
+│   Save 60-70%           │
+│   on restaurant food    │
+│                         │
+│   Get quality meals at  │
+│   fraction of the cost  │
+│                         │
+│   ○ ○ ○                 │
+│   [Skip] [Next →]       │
+└─────────────────────────┘
+Slide 2:
+┌─────────────────────────┐
+│                         │
+│   [Calendar + Clock]    │
+│   📅⏰│
+│                         │
+│   Fresh Today,          │
+│   Pick Up Tonight       │
+│                         │
+│   All items made fresh  │
+│   same day. No leftovers│
+│                         │
+│   ○ ○ ○                 │
+│   [Skip] [Next →]       │
+└─────────────────────────┘
+Slide 3:
+┌─────────────────────────┐
+│                         │
+│   [Earth + Restaurant]  │
+│   🌍🏪                 │
+│                         │
+│   Support Local         │
+│   Reduce Waste          │
+│                         │
+│   Help restaurants and  │
+│   save the planet!      │
+│                         │
+│   ○ ○ ○                 │
+│   [Skip] [Get Started]  │
+└─────────────────────────┘
+Elements:
+Swipeable carousel
+Dot indicators
+Skip button (top right)
+Next/Get Started button (bottom)
+Auto-advance after 5 sec (optional)
+Logic:
+User can swipe or tap Next
+Skip jumps to Signup
+Get Started (on slide 3) → Signup
+Technical:
+Use ViewPager (Android) / PageView (iOS)
+Save "onboarding_seen" flag to not show again
+
+Screen 3: Signup / Login
+Layout:
+┌─────────────────────────┐
+│   [< Back]              │
+│                         │
+│   Welcome to            │
+│   SurpriseBox! 👋       │
+│                         │
+│   Enter your phone      │
+│   number to continue    │
+│                         │
+│   ┌─────────────────┐   │
+│   │ +91 |___________|  │
+│   └─────────────────┘   │
+│                         │
+│   [Continue]            │
+│                         │
+│   By continuing, you    │
+│   agree to our Terms    │
+│   and Privacy Policy    │
+│                         │
+└─────────────────────────┘
+Elements:
+Header: "Welcome to SurpriseBox!"
+Phone input field (country code pre-filled +91)
+Continue button (disabled until 10 digits entered)
+Terms checkbox or text link
+Back arrow (returns to onboarding)
+Validation:
+Must be exactly 10 digits
+No letters or special characters
+Check if number already registered: 
+YES → Send OTP for login
+NO → Send OTP for signup
+OTP Screen:
+┌─────────────────────────┐
+│   [< Back]              │
+│                         │
+│   Verify Phone          │
+│                         │
+│   Enter 6-digit code    │
+│   sent to +91 98765XXX  │
+│                         │
+│   ┌─┬─┬─┬─┬─┬─┐│
+│   │_│_│_│_│_│_│         │
+│   └─┴─┴─┴─┴─┴─┘│
+│                         │
+│   Didn't receive?       │
+│   [Resend OTP] (in 30s) │
+│                         │
+│   [Verify]              │
+│                         │
+└─────────────────────────┘
+Elements:
+6 individual boxes for OTP digits
+Auto-focus next box on input
+Auto-verify when 6 digits entered
+Resend OTP (enabled after 30 sec)
+Edit phone number link
+Logic:
+Send OTP via SMS + WhatsApp simultaneously
+Verify OTP against backend
+If correct: 
+New user → Name input screen
+Existing user → Home screen
+Name Input (New Users Only):
+┌─────────────────────────┐
+│   [< Back]              │
+│                         │
+│   What's your name?     │
+│                         │
+│   ┌─────────────────┐   │
+│   │ Full Name       │   │
+│   │_________________│   │
+│   └─────────────────┘   │
+│                         │
+│   [Continue]            │
+│                         │
+└─────────────────────────┘
+Location Permission:
+┌─────────────────────────┐
+│                         │
+│   📍                    │
+│                         │
+│   Enable Location       │
+│                         │
+│   We need your location │
+│   to show nearby boxes  │
+│                         │
+│   [Allow Location]      │
+│   [Skip for now]        │
+│                         │
+└─────────────────────────┘
+Technical:
+Firebase Phone Auth OR custom OTP service
+Store: userId, phone, name, location
+Generate JWT token for session
+Store token securely (Keychain/KeyStore)
+
+Screen 4: Home Screen (Main Feed)
+Layout:
+┌─────────────────────────────────────┐
+│ SurpriseBox🔔☰│← Header
+├─────────────────────────────────────┤
+│                                     │
+│ 📍 Vidyanagar, Hubli [Change]   │  ← Location
+│                                     │
+│ ┌─────────────────────────────┐    │
+│ │ 🔍 Search restaurants...    │    │  ← Search
+│ └─────────────────────────────┘    │
+│                                     │
+│ ┌────────┬────────┬────────┐│
+│ │ All    │ Pizza  │ Bakery │       │  ← Filters
+│ │ ● 8    │   3    │   2    │       │
+│ └────────┴────────┴────────┘│
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ [Restaurant Image]   ║│
+│ ║║│
+│ ║ Pizza Corner          4.5 ⭐║│
+│ ║ Italian, Fast Food            ║│
+│ ║║│
+│ ║ Surprise Box - ₹99            ║│← Box Card 1
+│ ║ Worth ₹300+                   ║│
+│ ║║│
+│ ║🕐 8:00-9:00 PM               ║│
+│ ║📍 1.2 km  •  3 boxes left    ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ [Restaurant Image]   ║│
+│ ║║│
+│ ║ Sweet Delights        4.7 ⭐║│← Box Card 2
+│ ║ Desserts, Sweets              ║│
+│ ║ ...                           ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ [Load more...]                      │
+│                                     │
+└─────────────────────────────────────┘
+Header Elements:
+App logo/name (left)
+Notification bell icon (badge if unread)
+Hamburger menu (right)
+Location Bar:
+Current location (from GPS or manual)
+"Change" link → Location picker modal
+Search Bar:
+"Search restaurants..." placeholder
+Tapping → Search screen
+Filter Pills:
+"All" (with count of total boxes)
+Cuisine filters: Pizza, Bakery, Indian, Chinese, etc.
+Scrollable horizontally
+Active filter highlighted
+Box Cards (Repeating):
+Restaurant photo (appealing food image)
+Restaurant name + rating
+Cuisine tags
+"Surprise Box - ₹XX"
+Regular value
+Pickup time
+Distance + boxes left
+Entire card tappable → Box Details
+Bottom State:
+Infinite scroll OR "Load more" button
+Empty state if no boxes:
+😔 No boxes available right now
+  Check back at 4 PM daily!
+Pull-to-refresh:
+Swipe down to refresh feed
+Shows loading indicator
+Technical:
+API call: GET /boxes?lat=X&lon=Y&radius=5km
+Real-time updates via WebSocket OR polling every 30sec
+Image lazy loading (load as user scrolls)
+Cache for offline view
+
+Screen 5: Box Details
+Layout:
+┌─────────────────────────────────────┐
+│ < Back                         ︙│  ← Header
+├─────────────────────────────────────┤
+│                                     │
+│ ┌─────────────────────────────┐    │
+│ │                             │    │
+│ │   [Large Food Photo]        │    │  ← Hero Image
+│ │                             │    │
+│ └─────────────────────────────┘    │
+│                                     │
+│ ╔═════════════════════════════════╗│
+│ ║ Pizza Corner          4.5 ⭐║│← Restaurant
+│ ║ Italian, Fast Food              ║│     Info
+│ ║ 125 reviews                     ║│
+│ ║║│
+│ ║──────────────────────────────║│
+│ ║║│
+│ ║ Surprise Box                    ║│
+│ ║₹99                             ║│← Price
+│ ║ Regular value: ₹300-350         ║│
+│ ║💰 You save: ₹200+              ║│
+│ ║║│
+│ ║ What might be inside?           ║│
+│ ║• Pizza slices (2-3 pcs)   ║│← Contents
+│ ║• Garlic bread                  ║│     Hint
+│ ║• Side (pasta/salad)   ║│
+│ ║• Dessert                       ║│
+│ ║║│
+│ ║✓ Made fresh today              ║│
+│ ║⚠ Contains: Gluten, Dairy      ║│← Allergens
+│ ║║│
+│ ║──────────────────────────────║│
+│ ║║│
+│ ║ Pickup Today                    ║│
+│ ║⏰ 8:00 - 9:00 PM               ║│← Pickup
+│ ║║│     Details
+│ ║📍 Camp Road, opp. HDFC Bank   ║│
+│ ║    Vidyanagar, Hubli            ║│
+│ ║║│
+│ ║ [View on Map]   ║│
+│ ║ [📞 Call Restaurant]   ║│
+│ ║║│
+│ ║🔥 3 boxes left                 ║│← Scarcity
+│ ╚═════════════════════════════════╝│
+│                                     │
+│ ┌─────────────────────────────┐    │
+│ │   Reserve for ₹99           │    │  ← CTA
+│ └─────────────────────────────┘    │
+│                                     │
+│ Pay cash at pickup                  │  ← Payment note
+│                                     │
+└─────────────────────────────────────┘
+Header:
+Back arrow (left)
+Share icon (right) - share box with friends
+3-dot menu: Report, Favorite restaurant
+Hero Image:
+High-quality food photo
+Swipeable gallery if multiple photos
+Restaurant Section:
+Name + rating (stars)
+Cuisine tags
+Review count (tappable → Review screen)
+Box Details:
+Price (large, prominent)
+Regular value (crossed out)
+Savings highlighted (green)
+Contents description (bulleted)
+"Made fresh today" badge
+Allergen warning
+Pickup Info:
+Time window
+Full address
+"View on Map" button → Opens map view
+"Call Restaurant" → Phone dialer
+Distance from user
+Scarcity Indicator:
+"X boxes left" (updates real-time)
+Turns red when <3 boxes
+"Last box!" when 1 left
+Reserve Button:
+Fixed to bottom (always visible)
+Shows price
+Disabled if sold out
+Tapping → Reservation Confirmation Modal
+Technical:
+API: GET /boxes/{boxId}
+WebSocket for real-time availability
+Optimistic updates (reserve button disabled immediately on tap)
+
+Screen 6: Map View (Embedded in Box Details)
+Layout:
+┌─────────────────────────────────────┐
+│ < Back to Details                   │
+├─────────────────────────────────────┤
+│                                     │
+│  ┌──────────────────────────────┐  │
+│  │                              │  │
+│  │   [Google Map]   │  │
+│  │                              │  │
+│  │📍 You               │  │
+│  │                              │  │
+│  │                              │  │
+│  │🏪 Pizza Corner         │  │
+│  │   (1.2 km)   │  │
+│  │                              │  │
+│  │                              │  │
+│  └──────────────────────────────┘  │
+│                                     │
+│  📍 Camp Road, opp. HDFC Bank       │
+│     Vidyanagar, Hubli - 580032      │
+│                                     │
+│  ┌─────────────────────────────┐   │
+│  │   Get Directions            │   │
+│  └─────────────────────────────┘   │
+│                                     │
+└─────────────────────────────────────┘
+Elements:
+Interactive Google Map
+User location marker (blue dot)
+Restaurant location marker (custom icon)
+Distance shown
+"Get Directions" button → Opens Google Maps app
+Technical:
+Google Maps SDK (Android) / MapKit (iOS)
+Center on restaurant, zoom to show both points
+Tapping "Get Directions" → geo: URI for Google Maps
+
+Screen 7: Reservation Confirmation Modal
+Appears as bottom sheet when "Reserve" tapped:
+┌─────────────────────────────────────┐
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║║│
+│ ║ Confirm Reservation           ║│
+│ ║║│
+│ ║ Pizza Corner                  ║│
+│ ║ Surprise Box - ₹99            ║│
+│ ║║│
+│ ║ Pickup: Today, 8:00-9:00 PM   ║│
+│ ║ Address: Camp Road, Vidyanagar║│
+│ ║║│
+│ ║─────────────────────────────║│
+│ ║║│
+│ ║ Payment at Pickup             ║│
+│ ║💵 Cash only - ₹99            ║│
+│ ║║│
+│ ║─────────────────────────────║│
+│ ║║│
+│ ║☑ I agree to pick up within   ║│
+│ ║   the time slot. Late/No show ║│
+│ ║   may result in penalties.    ║│
+│ ║║│
+│ ║┌───────────────────────────┐║│
+│ ║│  Confirm Reservation      │║│
+│ ║└───────────────────────────┘║│
+│ ║║│
+│ ║ [Cancel]   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+└─────────────────────────────────────┘
+Elements:
+Restaurant name + box details
+Pickup time + address
+Payment method (cash)
+Terms checkbox (must check to enable button)
+"Confirm Reservation" button (primary CTA)
+"Cancel" link
+Interaction:
+Swipe down or tap outside to dismiss
+Checkbox must be checked to proceed
+Confirm button → API call → Success screen
+Technical:
+API: POST /reservations
+Body: {boxId, userId, pickupTime}
+On success → Navigate to Confirmation screen
+On error → Show error toast, stay on modal
+
+Screen 8: Reservation Success
+Layout:
+┌─────────────────────────────────────┐
+│                                     │
+│         ✓                           │
+│    (Green checkmark                 │
+│     animation)                      │
+│                                     │
+│   Reservation Confirmed!            │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║║│
+│ ║ Pizza Corner                  ║│
+│ ║ Surprise Box - ₹99            ║│
+│ ║║│
+│ ║──────────────────────────────║│
+│ ║║│
+│ ║ Reservation Code:             ║│
+│ ║ SB-1234                       ║│
+│ ║║│
+│ ║ [QR Code]   ║│
+│ ║║│
+│ ║ Show this code at pickup      ║│
+│ ║║│
+│ ║──────────────────────────────║│
+│ ║║│
+│ ║ Pickup Time:                  ║│
+│ ║ Today, 8:00-9:00 PM           ║│
+│ ║║│
+│ ║ Address:                      ║│
+│ ║ Camp Road, opp. HDFC Bank     ║│
+│ ║ Vidyanagar, Hubli             ║│
+│ ║║│
+│ ║ [Get Directions]   ║│
+│ ║║│
+│ ║☐ Set reminder (1 hour before)║│
+│ ║║│
+│ ║──────────────────────────────║│
+│ ║║│
+│ ║ Payment: Cash ₹99 at pickup   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ┌───────────────────────────────┐  │
+│ │  View My Reservations         │  │
+│ └───────────────────────────────┘  │
+│                                     │
+│ [Done]                              │
+│                                     │
+└─────────────────────────────────────┘
+Elements:
+Success animation (Lottie checkmark)
+"Reservation Confirmed!" headline
+Reservation code (alphanumeric, e.g., SB-1234)
+QR code (for restaurant to scan)
+Pickup details (time, address)
+"Get Directions" button
+"Set reminder" toggle
+"View My Reservations" button (takes to reservations list)
+"Done" button (returns to Home)
+Simultaneously:
+WhatsApp notification sent to user
+Push notification to restaurant partner
+Technical:
+Generate QR code: Encode {reservationId, userId, amount}
+QR format: Standard (scannable by any QR reader)
+"Set reminder" → Schedule local notification
+Confetti animation (optional, for delight)
+
+Screen 9: My Reservations
+Layout:
+┌─────────────────────────────────────┐
+│ < Back         My Reservations      │
+├─────────────────────────────────────┤
+│                                     │
+│ ┌──────────┬──────────┐│
+│ │  Active  │   Past   │             │  ← Tabs
+│ │    (2)   │   (15)   │             │
+│ └──────────┴──────────┘│
+│                                     │
+│ ── Active Reservations ──           │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ Pizza Corner                  ║│
+│ ║║│
+│ ║ Pickup: Today, 8-9 PM         ║│
+│ ║⏰ Pick up in 2 hours          ║│  ← Reservation 1
+│ ║║│
+│ ║ Code: SB-1234                 ║│
+│ ║ [View QR Code]   ║│
+│ ║║│
+│ ║📍 1.2 km  [Directions]   ║│
+│ ║║│
+│ ║ [Cancel Reservation]   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ Sweet Delights                ║│
+│ ║║│
+│ ║ Pickup: Tomorrow, 8-9 PM      ║│← Reservation 2
+│ ║ ...                           ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ [No more active reservations]       │
+│                                     │
+└─────────────────────────────────────┘
+Active Tab:
+Shows upcoming reservations
+Each card displays: 
+Restaurant name
+Pickup time + countdown ("in X hours")
+Reservation code
+"View QR Code" expandable section
+Distance + Get Directions
+"Cancel Reservation" link
+Sorted by pickup time (soonest first)
+Empty state: "No active reservations. Browse boxes!"
+Past Tab:
+┌─────────────────────────────────────┐
+│ ── Past Orders ──                   │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ Pizza Corner        4.5 ⭐║│
+│ ║║│
+│ ║ March 1, 2026                 ║│
+│ ║ Paid: ₹99                     ║│
+│ ║║│
+│ ║ [Rate this experience]   ║│← If not rated
+│ ║║│
+│ ║ [Your rating: 5⭐]   ║│← If already rated
+│ ║ [View receipt]   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ Sweet Delights      4.7 ⭐║│
+│ ║ Feb 28, 2026                  ║│
+│ ║ ...                           ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ [Load more...]                      │
+│                                     │
+└─────────────────────────────────────┘
+Past Tab:
+Shows completed pickups
+Each card displays: 
+Restaurant name + rating
+Date of pickup
+Amount paid
+"Rate this experience" (if not rated)
+User's rating (if already rated)
+"View receipt" link
+Paginated (load 20 at a time)
+Empty state: "No past orders yet"
+Interactions:
+Tap card → Expands to show full details
+"Cancel Reservation" → Confirmation modal
+"View QR Code" → Expands QR within card
+"Get Directions" → Google Maps
+"Rate" → Rating modal
+Technical:
+API: GET /reservations?userId=X&status=active
+API: GET /reservations?userId=X&status=completed&page=1
+Real-time updates for countdown timers
+Local storage for quick load
+
+Screen 10: Rating Modal
+Appears after pickup (30 min later):
+┌─────────────────────────────────────┐
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║║│
+│ ║ How was your                  ║│
+│ ║ Surprise Box?                 ║│
+│ ║║│
+│ ║ Pizza Corner                  ║│
+│ ║║│
+│ ║☆☆☆☆☆║│← Star rating
+│ ║ (Tap to rate)   ║│
+│ ║║│
+│ ║ What did you get?             ║│
+│ ║┌─────────────────────────┐║│
+│ ║│ [Upload photo]   │║│← Photo upload
+│ ║└─────────────────────────┘║│
+│ ║║│
+│ ║ Quick tags:                   ║│
+│ ║ [Great value] [Fresh food]   ║│← Tag pills
+│ ║ [Good portion] [Tasty]   ║│
+│ ║║│
+│ ║ Any feedback? (optional)   ║│
+│ ║┌─────────────────────────┐║│
+│ ║││║│← Text area
+│ ║││║│
+│ ║└─────────────────────────┘║│
+│ ║║│
+│ ║┌───────────────────────────┐║│
+│ ║│  Submit Rating            │ ║│
+│ ║└───────────────────────────┘║│
+│ ║║│
+│ ║ [Skip for now]   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+└─────────────────────────────────────┘
+Elements:
+Restaurant name at top
+5-star rating (tappable, lights up on select)
+Photo upload section (camera icon, gallery picker)
+Quick tag pills (multi-select, highlights on tap)
+Text feedback (optional, max 200 chars)
+"Submit Rating" button (enabled after star selection)
+"Skip for now" link
+Tags available:
+Positive: "Great value", "Fresh", "Good portion", "Tasty", "Exceeded expectations"
+Negative: "Too small", "Not fresh", "Disappointed", "Overpriced"
+Logic:
+Star rating required (1-5)
+Photo optional but encouraged
+Tags optional
+Text optional
+On submit: 
+Save rating to database
+Show thank you message
+Award points (if gamification enabled)
+Return to previous screen
+Technical:
+API: POST /ratings
+Body: {reservationId, stars, photo, tags[], feedback}
+Photo upload to cloud storage (S3/Firebase)
+Compress image before upload (max 2MB)
+
+Screen 11: Profile / Settings
+Layout:
+┌─────────────────────────────────────┐
+│ < Back            Profile            │
+├─────────────────────────────────────┤
+│                                     │
+│       👤                            │
+│                                     │
+│    Priya Mehta                      │
+│    +91 98765 43210                  │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ MY ACCOUNT                          │
+│                                     │
+│ > Edit Profile                      │
+│ > My Addresses                      │
+│ > Payment Methods                   │
+│ > Rewards & Points (125 pts)        │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ PREFERENCES                         │
+│                                     │
+│ > Notifications                     │
+│ > Dietary Preferences               │
+│ > Language (English)                │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ SUPPORT                             │
+│                                     │
+│ > Help & FAQs                       │
+│ > Contact Support                   │
+│ > Rate the App                      │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ LEGAL                               │
+│                                     │
+│ > Terms of Service                  │
+│ > Privacy Policy                    │
+│ > About SurpriseBox                 │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ [Log Out]                           │
+│                                     │
+│ Version 1.0.0                       │
+│                                     │
+└─────────────────────────────────────┘
+Sections:
+Header: Avatar (initials if no photo), Name, Phone
+My Account: Profile, addresses, payments, rewards
+Preferences: Notifications, dietary, language
+Support: Help, contact, rate app
+Legal: Terms, privacy, about
+Logout button (red text)
+Version number (small, bottom)
+Each menu item:
+Right arrow (→) indicating it's tappable
+Tapping opens respective screen
+Edit Profile Screen:
+┌─────────────────────────────────────┐
+│ < Back         Edit Profile          │
+├─────────────────────────────────────┤
+│                                     │
+│       [Profile Photo]               │
+│       (Tap to change)               │
+│                                     │
+│ Full Name                           │
+│ ┌─────────────────────────────┐    │
+│ │ Priya Mehta                 │    │
+│ └─────────────────────────────┘    │
+│                                     │
+│ Email (optional)                    │
+│ ┌─────────────────────────────┐    │
+│ │ priya@example.com           │    │
+│ └─────────────────────────────┘    │
+│                                     │
+│ Phone Number                        │
+│ ┌─────────────────────────────┐    │
+│ │ +91 98765 43210             │    │
+│ └─────────────────────────────┘    │
+│ (Verified ✓)                        │
+│                                     │
+│ Date of Birth (optional)            │
+│ ┌─────────────────────────────┐    │
+│ │ DD / MM / YYYY              │    │
+│ └─────────────────────────────┘    │
+│                                     │
+│ ┌───────────────────────────────┐  │
+│ │  Save Changes                 │  │
+│ └───────────────────────────────┘  │
+│                                     │
+└─────────────────────────────────────┘
+Notifications Settings:
+┌─────────────────────────────────────┐
+│ < Back      Notifications            │
+├─────────────────────────────────────┤
+│                                     │
+│ PUSH NOTIFICATIONS                  │
+│                                     │
+│ New boxes available        [Toggle]│
+│ Reservation reminders      [Toggle]│
+│ Special offers             [Toggle]│
+│ Rate your experience       [Toggle]│
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ WHATSAPP NOTIFICATIONS              │
+│                                     │
+│ Reservation confirmations  [Toggle]│
+│ Pickup reminders           [Toggle]│
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ EMAIL (if provided)                 │
+│                                     │
+│ Weekly summary             [Toggle]│
+│ Promotional emails         [Toggle]│
+│                                     │
+└─────────────────────────────────────┘
+Technical:
+API: GET /users/{userId}
+API: PUT /users/{userId} (update profile)
+Store notification preferences locally + sync to backend
+Toggles trigger immediate save (no "Save" button needed)
+
+5.2 Restaurant Partner App Screens
+Screen 1: Partner Login
+Similar to customer login:
+┌─────────────────────────────────────┐
+│                                     │
+│   Welcome, Partner! 🤝              │
+│                                     │
+│   SurpriseBox for Business          │
+│                                     │
+│   Enter your registered             │
+│   phone number                      │
+│                                     │
+│   ┌─────────────────────────────┐  │
+│   │ +91 |_____________________|  │  │
+│   └─────────────────────────────┘  │
+│                                     │
+│   [Continue]                        │
+│                                     │
+│   Not registered yet?               │
+│   [Contact us to partner]           │
+│                                     │
+└─────────────────────────────────────┘
+Logic:
+Only restaurant owners can access (phone verified during onboarding)
+OTP verification same as customer app
+After login → Dashboard
+
+Screen 2: Partner Dashboard
+Layout:
+┌─────────────────────────────────────┐
+│ ☰SurpriseBox Partner      🔔      │
+├─────────────────────────────────────┤
+│                                     │
+│ Pizza Corner                        │
+│ Camp Road, Vidyanagar               │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ TODAY'S SUMMARY                ║│
+│ ║║│
+│ ║ Boxes listed:  5              ║│
+│ ║ Boxes sold:    4              ║│
+│ ║ Picked up:     3              ║│
+│ ║ Pending:       1              ║│
+│ ║║│
+│ ║ Revenue:      ₹280            ║│
+│ ║ (After 30% commission)   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ┌───────────────────────────────┐  │
+│ │ 📦 List Boxes for Today       │  │  ← Primary CTA
+│ └───────────────────────────────┘  │
+│                                     │
+│ QUICK ACTIONS                       │
+│                                     │
+│ > View Active Reservations (1)      │
+│ > Today's Earnings                  │
+│ > Weekly Report                     │
+│ > Monthly Analytics                 │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ NOTIFICATIONS                       │
+│                                     │
+│ • New reservation! SB-5678          │
+│   2 minutes ago                     │
+│                                     │
+│ • Pickup completed - SB-5677        │
+│   15 minutes ago                    │
+│                                     │
+│ [View all]                          │
+│                                     │
+└─────────────────────────────────────┘
+Elements:
+Restaurant name + location (header)
+Today's summary card: 
+Boxes listed, sold, picked up, pending
+Revenue (after commission deduction)
+"List Boxes" button (large, prominent)
+Quick actions menu
+Recent notifications feed
+Hamburger menu (top left): Profile, Settings, Help, Logout
+Logic:
+Dashboard refreshes on app open
+Real-time updates for reservations
+Summary resets at midnight
+Technical:
+API: GET /partners/{restaurantId}/dashboard
+Response includes: {boxes_listed, boxes_sold, picked_up, pending, revenue}
+WebSocket for real-time reservation notifications
+
+Screen 3: List Boxes Flow
+Step 1: Simple Form
+┌─────────────────────────────────────┐
+│ < Back       List Boxes for Today   │
+├─────────────────────────────────────┤
+│                                     │
+│ How many boxes?                     │
+│                                     │
+│ ┌─────────────────────────────┐    │
+│ │                             │    │
+│ │   -    [5  ]    +         │    │  ← Number picker
+│ │                             │    │
+│ └─────────────────────────────┘    │
+│                                     │
+│ What might be inside? (optional)    │
+│ ┌─────────────────────────────┐    │
+│ │ Pizza slices, garlic bread, │    │
+│ │ pasta, dessert              │    │  ← Text area
+│ └─────────────────────────────┘    │
+│                                     │
+│ Pickup time                         │
+│ ┌────────┬────────┐│
+│ │ 8:00PM │ 9:00PM │                │  ← Time pickers
+│ └────────┴────────┘│
+│                                     │
+│ Price per box                       │
+│ ┌─────────────────────────────┐    │
+│ │                             │    │
+│ │ ₹ [   99   ]                │    │  ← Price input
+│ │                             │    │
+│ │ ───────●──────────          │    │  ← Slider
+│ │ ₹80          ₹120           │    │
+│ │                             │    │
+│ │ Recommended: ₹99            │    │
+│ └─────────────────────────────┘    │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ PREVIEW                       ║│
+│ ║║│
+│ ║ 5 Surprise Boxes - ₹99 each  ║│
+│ ║ Pickup: 8:00-9:00 PM          ║│
+│ ║║│
+│ ║ You'll receive: ₹70 per box   ║│
+│ ║ Total potential: ₹350         ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ┌───────────────────────────────┐  │
+│ │  List Boxes                   │  │
+│ └───────────────────────────────┘  │
+│                                     │
+└─────────────────────────────────────┘
+Validation:
+Min 1 box, max 20 boxes
+Price must be ₹80-120
+Default pickup time: 8-9 PM
+"What's inside" max 100 chars
+On "List Boxes" tap:
+API call: POST /listings
+Success → Confirmation screen
+Error → Toast message, stay on form
+Step 2: Confirmation
+┌─────────────────────────────────────┐
+│                                     │
+│         ✓                           │
+│                                     │
+│   Boxes Listed!                     │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║║│
+│ ║ 5 Surprise Boxes              ║│
+│ ║₹99 each                      ║│
+│ ║║│
+│ ║ Now visible to customers!     ║│
+│ ║║│
+│ ║ We'll notify you when         ║│
+│ ║ reservations come in.         ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ┌───────────────────────────────┐  │
+│ │  View Reservations            │  │
+│ └───────────────────────────────┘  │
+│                                     │
+│ [Back to Dashboard]                 │
+│                                     │
+└─────────────────────────────────────┘
+Note: Can edit/cancel listing until first reservation comes in.
+
+Screen 4: Reservations Management
+Layout:
+┌─────────────────────────────────────┐
+│ < Back      Today's Reservations     │
+├─────────────────────────────────────┤
+│                                     │
+│ ┌──────────┬──────────┐│
+│ │ Active(3)│ Complete │             │  ← Tabs
+│ └──────────┴──────────┘│
+│                                     │
+│ ── Active Reservations ──           │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ SB-1234                       ║│
+│ ║║│
+│ ║ Priya M.                      ║│
+│ ║ +91 98765 XXXXX               ║│
+│ ║║│
+│ ║ Expected: 8:15 PM             ║│
+│ ║ Status: Waiting               ║│
+│ ║║│
+│ ║ [📞 Call] [✓ Mark Picked Up]  ║│
+│ ║║│
+│ ║ [⊕ Scan QR Code]   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ SB-1235                       ║│
+│ ║ Rohan S.                      ║│
+│ ║ ...                           ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ [No more active reservations]       │
+│                                     │
+└─────────────────────────────────────┘
+Each Reservation Card:
+Reservation code (large, top)
+Customer name (first name + initial)
+Customer phone (masked, full visible on tap)
+Expected pickup time
+Status: Waiting / Picked Up / No-show
+Actions: 
+Call button (opens dialer)
+"Mark Picked Up" button
+"Scan QR Code" button (expands scanner)
+"Report No-show" (if 30+ min late)
+QR Scanner (Expanded):
+┌─────────────────────────────────────┐
+│ < Close                             │
+├─────────────────────────────────────┤
+│                                     │
+│  ┌──────────────────────────────┐  │
+│  │                              │  │
+│  │   [Camera Viewfinder]   │  │
+│  │                              │  │
+│  │       ┌──────────┐           │  │
+│  │       │          │           │  │
+│  ││  [QR  ]│           │  │  ← QR Scanner
+│  │       │          │           │  │
+│  │       └──────────┘           │  │
+│  │                              │  │
+│  │  Align QR code in frame      │  │
+│  │                              │  │
+│  └──────────────────────────────┘  │
+│                                     │
+│  Can't scan? [Enter code manually] │
+│                                     │
+└─────────────────────────────────────┘
+On successful scan:
+Verify code against reservation
+Show confirmation: "Code verified ✓"
+Ask: "Collect ₹99 cash and hand over box"
+Button: "Confirm Pickup Complete"
+Manual Code Entry:
+┌─────────────────────────────────────┐
+│ < Back        Enter Code             │
+├─────────────────────────────────────┤
+│                                     │
+│ Enter reservation code              │
+│                                     │
+│ ┌─────────────────────────────┐    │
+│ │ SB-____                     │    │  ← Code input
+│ └─────────────────────────────┘    │
+│                                     │
+│ [Verify Code]                       │
+│                                     │
+└─────────────────────────────────────┘
+After "Mark Picked Up":
+Reservation moves to "Completed" tab
+Revenue added to today's earnings
+Customer gets notification to rate
+Completed Tab:
+┌─────────────────────────────────────┐
+│ ── Completed Pickups ──             │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ SB-1233                       ║│
+│ ║ Amit K.                       ║│
+│ ║ Picked up: 8:12 PM            ║│
+│ ║ Earned: ₹70                   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ [Load more...]                      │
+│                                     │
+└─────────────────────────────────────┘
+Technical:
+API: GET /partners/{restaurantId}/reservations?status=active
+QR scanner using device camera
+Parse QR data, verify with backend
+API: PUT /reservations/{id}/pickup (mark as picked up)
+
+Screen 5: Earnings & Analytics
+Daily Earnings:
+┌─────────────────────────────────────┐
+│ < Back      Today's Earnings         │
+├─────────────────────────────────────┤
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ EARNINGS TODAY                ║│
+│ ║║│
+│ ║₹280                          ║│← Big number
+│ ║║│
+│ ║ (After commission)   ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ BREAKDOWN                           │
+│                                     │
+│ Boxes sold: 4                       │
+│ Price per box: ₹99                  │
+│ Gross revenue: ₹396                 │
+│                                     │
+│ Platform fee (30%): -₹118.80        │
+│ Your earnings: ₹280.20              │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ TRANSACTION HISTORY                 │
+│                                     │
+│ SB-1234  8:12PM  ₹70   ✓           │
+│ SB-1235  8:20PM  ₹70   ✓           │
+│ SB-1236  8:35PM  ₹70   ✓           │
+│ SB-1237  8:50PM  ₹70   ✓           │
+│                                     │
+└─────────────────────────────────────┘
+Weekly Report:
+┌─────────────────────────────────────┐
+│ < Back       This Week               │
+├─────────────────────────────────────┤
+│                                     │
+│ Mar 3 - Mar 9, 2026                 │
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ TOTAL EARNINGS                ║│
+│ ║║│
+│ ║₹1,960                        ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ DAY-WISE BREAKDOWN                  │
+│                                     │
+│ Mon Mar 3  │ 4 boxes  │ ₹280       │
+│ Tue Mar 4  │ 5 boxes  │ ₹350       │
+│ Wed Mar 5  │ 6 boxes  │ ₹420       │
+│ Thu Mar 6  │ 7 boxes  │ ₹490       │
+│ Fri Mar 7  │ 6 boxes  │ ₹420       │
+│ Sat Mar 8  │ 0 boxes  │ ₹0         │  ← Restaurant closed
+│ Sun Mar 9  │ 0 boxes  │ ₹0         │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ PERFORMANCE                         │
+│                                     │
+│ Total boxes sold: 28                │
+│ Average per day: 4                  │
+│ Sell-through rate: 93%              │  ← Listed 30, sold 28
+│ Customer rating: 4.6 ⭐             │
+│                                     │
+│ ──────────────────────────────────  │
+│                                     │
+│ PAYMENT STATUS                      │
+│                                     │
+│ Will be paid on: Friday, Mar 14     │
+│ Payment method: UPI                 │
+│ UPI ID: pizzacorner@ybl             │
+│                                     │
+│ [View payment history]              │
+│                                     │
+└─────────────────────────────────────┘
+Monthly Analytics:
+┌─────────────────────────────────────┐
+│ < Back     February 2026             │
+├─────────────────────────────────────┤
+│                                     │
+│ ╔═══════════════════════════════╗│
+│ ║ TOTAL EARNINGS                ║│
+│ ║║│
+│ ║₹8,400                        ║│
+│ ╚═══════════════════════════════╝│
+│                                     │
+│ [Bar Chart: Daily earnings]   │  ← Visual chart
+│                                     │
+│ KEY METRICS                         │
+│                                     │
+│ Total boxes sold: 120               │
+│ Busiest day: Thursday (avg 6 boxes) │
+│ Average rating: 4.5 ⭐              │
+│ Repeat customers: 35%               │
+│                                     │
+│ TOP PERFORMING ITEMS                │
+│                                     │
+│ 1. Pizza boxes (45 sold)            │
+│ 2. Pasta boxes (30 sold)            │
+│ 3. Mixed boxes (25 sold)            │
+│                                     │
+│ GROWTH                              │
+│                                     │
+│ vs January: +15% ↑                  │
+│ New customers: 18                   │
+│                                     │
+│ [Download PDF Report]               │
+│                                     │
+└─────────────────────────────────────┘
+Technical:
+API: GET /partners/{restaurantId}/earnings?period=today|week|month
+Charts using Chart.js or native charting library
+PDF generation on backend (email link to download)
+
+6. TECHNICAL ARCHITECTURE
+6.1 Technology Stack
+Frontend (Mobile Apps)
+Customer App:
+Framework: React Native (cross-platform iOS & Android) 
+Why: Single codebase, faster development, 90% code sharing
+Alternative: Flutter (if team prefers Dart)
+State Management: Redux Toolkit + Redux Persist
+Navigation: React Navigation v6
+UI Components: React Native Paper (Material Design)
+Maps: react-native-maps (Google Maps integration)
+QR Code: react-native-qrcode-scanner
+Notifications: Firebase Cloud Messaging (FCM)
+Analytics: Firebase Analytics + Mixpanel
+Crash Reporting: Firebase Crashlytics
+Restaurant Partner App:
+Same stack as customer app (shared components where possible)
+Additional: react-native-camera (QR scanning)
+Why React Native over Native:
+Faster time-to-market (6-8 weeks vs 12-16 weeks)
+Easier to find developers
+Lower maintenance cost (one codebase)
+Performance adequate for this use case (not gaming/heavy graphics)
+
+Backend
+API Server:
+Framework: Node.js + Express.js 
+Why: JavaScript everywhere (frontend devs can contribute)
+Fast development, huge ecosystem
+Alternative: Python + FastAPI (if team prefers Python)
+Database: PostgreSQL (primary) 
+Relational data (users, restaurants, boxes, reservations)
+ACID compliance important for financial transactions
+Cache: Redis 
+Session storage
+Real-time availability caching
+Rate limiting
+File Storage: AWS S3 / Google Cloud Storage 
+Restaurant photos
+User uploaded photos (ratings)
+QR codes
+Search: Elasticsearch (later phase) 
+Restaurant search
+Location-based queries
+Real-Time Features:
+WebSocket: Socket.io 
+Real-time availability updates
+Reservation notifications
+Chat (if we add customer-restaurant chat)
+Background Jobs:
+Queue: Bull (Redis-based) 
+Send notifications (async)
+Generate daily reports
+Process payments
+Authentication:
+JWT Tokens (JSON Web Tokens) 
+Stateless authentication
+30-day expiry
+OTP Service: Twilio Verify API 
+SMS + WhatsApp OTPs
+Payments: (Phase 2)
+Gateway:Razorpay / Cashfree
+UPI, cards, wallets
+Escrow handling
+Phase 1: Cash-only (no integration needed)
+
+Infrastructure
+Hosting:
+Cloud Provider: AWS / Google Cloud / DigitalOcean
+Recommendation: Start with DigitalOcean (cheaper, simpler)
+Migrate to AWS/GCP if scale demands
+Server:
+Phase 1: Single VPS (2 CPU, 4GB RAM) - ₹1,500/month
+Phase 2: Load-balanced setup (2+ servers)
+Database: Managed PostgreSQL (DigitalOcean Managed Database)
+CDN: Cloudflare (for static assets, images)
+DevOps:
+CI/CD: GitHub Actions 
+Automated testing
+Automated deployment
+Monitoring:
+Sentry (error tracking)
+DataDog / New Relic (performance monitoring)
+Logging: Winston + LogDNA
+Domains & SSL:
+Domain: surprisebox.in (₹1,000/year)
+SSL: Let's Encrypt (free)
+
+Third-Party Services
+Service
+Purpose
+Cost (Monthly)
+Firebase
+Auth, FCM, Analytics
+Free tier
+Twilio
+SMS OTPs
+₹2,000 (est.)
+Google Maps API
+Maps, directions
+₹3,000 (est.)
+AWS S3
+Image storage
+₹500
+DigitalOcean
+Server hosting
+₹1,500
+Cloudflare
+CDN
+Free tier
+Sentry
+Error tracking
+Free tier
+TOTAL (MVP)
+
+~₹7,000
+Note: All estimates assume 1,000 active users, 200 boxes/day
+
+6.2 System Architecture Diagram
+┌─────────────────────────────────────────────────────────────┐
+│                         CLIENTS                             │
+│                                                             │
+│  ┌──────────────┐         ┌──────────────┐                 │
+│  │   Customer   │         │  Restaurant  │                 │
+│  │   Mobile App │         │  Partner App │                 │
+│  │ (React Native│         │ (React Native│                 │
+│  └──────────────┘         └──────────────┘                 │
+│         │                         │                         │
+│         └─────────────┬───────────┘│
+│                       │                                     │
+│                       ▼│
+│              ┌─────────────────┐                            │
+│              │   API Gateway   │                            │
+│              │  (Load Balancer)│                            │
+│              └─────────────────┘                            │
+│                       │                                     │
+│         ┌─────────────┼─────────────┐│
+│         │             │             │                       │
+│         ▼▼▼│
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐              │
+│  │  Auth      │ │  API       │ │ WebSocket  │              │
+│  │  Service   │ │  Server    │ │  Server    │              │
+│  │ (Node.js)  │ │ (Express)  │ │ (Socket.io)│              │
+│  └────────────┘ └────────────┘ └────────────┘              │
+│         │             │             │                       │
+│         └─────────────┼─────────────┘│
+│                       │                                     │
+│         ┌─────────────┼─────────────┐│
+│         │             │             │                       │
+│         ▼▼▼│
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐              │
+│  │ PostgreSQL │ │   Redis    │ │   Queue    │              │
+│  │ (Database) │ │  (Cache)   │ │   (Bull)   │              │
+│  └────────────┘ └────────────┘ └────────────┘              │
+│                                       │                     │
+│                                       ▼│
+│                                ┌────────────┐               │
+│                                │ Background │               │
+│                                │   Workers  │               │
+│                                └────────────┘               │
+│                                       │                     │
+│         ┌─────────────────────────────┼──────────┐│
+│         │             │               │          │          │
+│         ▼▼▼▼│
+│  ┌────────────┐ ┌────────────┐ ┌──────────┐ ┌────────┐    │
+│  │  Twilio    │ │  Firebase  │ │   AWS    │ │ Google │    │
+│  │   (SMS)    │ │   (FCM)    │ │   S3     │ │  Maps  │    │
+│  └────────────┘ └────────────┘ └──────────┘ └────────┘    │
+│                                                             │
+│                    EXTERNAL SERVICES                        │
+└─────────────────────────────────────────────────────────────┘
+
+6.3 Data Flow Examples
+Example 1: Customer Reserves a Box
+1. User taps "Reserve" button
+   │
+├─> App sends POST request:
+   │   POST /api/reservations
+   │   Body: {boxId: 123, userId: 456}
+   │   Headers: {Authorization: "Bearer JWT_TOKEN"}
+   │
+2. API Gateway → Auth Service
+   │
+├─> Verify JWT token
+├─> If invalid → Return 401 Unauthorized
+   └─> If valid → Proceed
+   │
+3. API Server receives request
+   │
+├─> Check box availability (query Redis cache)
+   │   └─> If sold out → Return 409 Conflict
+   │
+├─> Create reservation record (PostgreSQL)
+   │   INSERT INTO reservations (box_id, user_id, status, ...)
+   │
+├─> Decrement box availability (Redis + PostgreSQL)
+   │   UPDATE boxes SET quantity = quantity - 1 WHERE id = 123
+   │
+├─> Generate reservation code (e.g., SB-1234)
+   │
+├─> Generate QR code (encode {reservationId, userId, amount})
+   │   └─> Save QR image to S3
+   │
+4. Add jobs to queue (async)
+   │
+├─> Send WhatsApp notification to customer
+├─> Send push notification to restaurant
+├─> Send email confirmation (if email provided)
+   │
+5. Return success response to app
+   │
+   └─> {
+        "success": true,
+        "reservation": {
+          "id": 789,
+          "code": "SB-1234",
+          "qrCodeUrl": "https://s3.../qr-code.png",
+          "pickupTime": "8:00-9:00 PM",
+          "restaurant": {...}
+        }
+      }
+   │
+6. App navigates to Confirmation screen
+   │
+7. Background workers process queue
+   │
+├─> Twilio API: Send WhatsApp message
+├─> Firebase FCM: Send push notification
+   └─> SendGrid: Send email
+   │
+8. WebSocket broadcasts to all connected clients
+   │
+   └─> "Box 123 availability updated: 2 left"
+   │
+9. Restaurant app receives notification
+   │
+   └─> Push notification: "New reservation! SB-1234"
+
+DONE
+
+Example 2: Restaurant Lists Boxes
+1. Restaurant owner taps "List Boxes"
+   │
+├─> App sends POST request:
+   │   POST /api/listings
+   │   Body: {
+   │     restaurantId: 789,
+   │     quantity: 5,
+   │     price: 99,
+   │     pickupStart: "20:00",
+   │     pickupEnd: "21:00",
+   │     description: "Pizza slices, garlic bread..."
+   │   }
+   │
+2. API Server receives request
+   │
+├─> Validate input (quantity 1-20, price 80-120, etc.)
+   │
+├─> Create listing record (PostgreSQL)
+   │   INSERT INTO listings (restaurant_id, quantity, price, ...)
+   │
+├─> Cache in Redis for fast retrieval
+   │   SET listing:{listingId} {JSON}
+   │   EXPIRE listing:{listingId} 21600  (6 hours TTL)
+   │
+├─> Add to geospatial index (Redis)
+   │   GEOADD listings {longitude} {latitude} {listingId}
+   │
+3. Return success response
+   │
+4. Add job to queue
+   │
+├─> Send notifications to nearby customers
+   │   └─> "New boxes available near you!"
+   │
+5. WebSocket broadcasts to all connected customers
+   │
+   └─> "New listing available: Pizza Corner"
+   │
+6. Customer apps refresh home feed
+   │
+   └─> Query API: GET /api/boxes?lat=X&lon=Y&radius=5
+   │
+7. API responds with listings
+   │
+├─> Query Redis geospatial index
+   │   GEORADIUS listings {lon} {lat} 5 km
+   │
+├─> Fetch listing details from cache/DB
+   │
+   └─> Return JSON array of boxes
+
+DONE
+
+7. DATABASE SCHEMA
+7.1 PostgreSQL Tables
+Table: users
+sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  phone VARCHAR(15) UNIQUE NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100),
+profile_photo_url TEXT,
+date_of_birth DATE,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+last_login TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+fcm_token TEXT, -- For push notifications
+  preferences JSONB DEFAULT '{}', -- {dietary, notifications, etc.}
+  INDEX idx_phone (phone),
+  INDEX idx_email (email)
+);
+Sample row:
+json
+{
+  "id": 456,
+  "phone": "+919876543210",
+  "name": "Priya Mehta",
+  "email": "priya@example.com",
+  "profile_photo_url": "https://s3.../profile456.jpg",
+  "date_of_birth": "1998-05-15",
+  "created_at": "2026-02-01T10:30:00Z",
+  "fcm_token": "fcm_token_abc123",
+  "preferences": {
+    "notifications": {
+      "push": true,
+      "whatsapp": true
+    },
+    "dietary": ["vegetarian"]
+  }
+}
+
+Table: restaurants
+sql
+CREATE TABLE restaurants (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+owner_nameVARCHAR(100),
+owner_phoneVARCHAR(15) UNIQUE NOT NULL,
+  email VARCHAR(100),
+  address TEXT NOT NULL,
+  city VARCHAR(50) NOT NULL,
+  latitude DECIMAL(10, 8) NOT NULL,
+  longitude DECIMAL(11, 8) NOT NULL,
+cuisine_typesTEXT[], -- Array: ['Italian', 'Fast Food']
+logo_url TEXT,
+cover_photo_url TEXT,
+  description TEXT,
+average_ratingDECIMAL(3, 2) DEFAULT 0.00,
+total_ratings INT DEFAULT 0,
+commission_rateDECIMAL(5, 2) DEFAULT 30.00, -- Percentage
+is_active BOOLEAN DEFAULT TRUE,
+is_verified BOOLEAN DEFAULT FALSE,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+bank_details JSONB, -- {accountNumber, ifsc, upiId}
+business_hours JSONB, -- {mon: {open: "10:00", close: "22:00"}, ...}
+  INDEX idx_owner_phone (owner_phone),
+  INDEX idx_location (latitude, longitude),
+  INDEX idx_city (city)
+);
+Sample row:
+json
+{
+  "id": 789,
+  "name": "Pizza Corner",
+  "owner_name": "Rajesh Kumar",
+  "owner_phone": "+919123456789",
+  "address": "Camp Road, opp. HDFC Bank, Vidyanagar",
+  "city": "Hubli",
+  "latitude": 15.3647,
+  "longitude": 75.1240,
+  "cuisine_types": ["Italian", "Fast Food"],
+  "logo_url": "https://s3.../pizza-corner-logo.jpg",
+  "average_rating": 4.5,
+  "total_ratings": 125,
+  "commission_rate": 25.00,
+  "is_active": true,
+  "is_verified": true,
+  "bank_details": {
+    "upiId": "pizzacorner@ybl"
+  },
+  "business_hours": {
+    "mon": {"open": "11:00", "close": "22:00"},
+    "tue": {"open": "11:00", "close": "22:00"},
+    ...
+  }
+}
+
+Table: listings (Boxes)
+sql
+CREATE TABLE listings (
+  id SERIAL PRIMARY KEY,
+restaurant_id INT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+quantity_total INT NOT NULL, -- Total boxes listed
+quantity_available INT NOT NULL, -- Remaining boxes
+  price DECIMAL(10, 2) NOT NULL,
+regular_valueDECIMAL(10, 2), -- Estimated worth
+  description TEXT, -- "What might be inside"
+pickup_date DATE NOT NULL,
+pickup_start_time TIME NOT NULL,
+pickup_end_time TIME NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+is_active BOOLEAN DEFAULT TRUE,
+sold_out_at TIMESTAMP, -- When it sold out
+  allergens TEXT[], -- ['gluten', 'dairy']
+  INDEX idx_restaurant_id (restaurant_id),
+  INDEX idx_pickup_date (pickup_date),
+  INDEX idx_is_active (is_active),
+  CONSTRAINT chk_quantity CHECK (quantity_available >= 0),
+  CONSTRAINT chk_quantity_total CHECK (quantity_available <= quantity_total)
+);
+Sample row:
+json
+{
+  "id": 123,
+  "restaurant_id": 789,
+  "quantity_total": 5,
+  "quantity_available": 2,
+  "price": 99.00,
+  "regular_value": 300.00,
+  "description": "Pizza slices, garlic bread, pasta, dessert",
+  "pickup_date": "2026-03-05",
+  "pickup_start_time": "20:00:00",
+  "pickup_end_time": "21:00:00",
+  "created_at": "2026-03-05T15:30:00Z",
+  "is_active": true,
+  "allergens": ["gluten", "dairy"]
+}
+
+Table: reservations
+sql
+CREATE TABLE reservations (
+  id SERIAL PRIMARY KEY,
+listing_id INT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+restaurant_id INT NOT NULL REFERENCES restaurants(id),
+reservation_codeVARCHAR(20) UNIQUE NOT NULL, -- SB-1234
+qr_code_url TEXT,
+  status VARCHAR(20) NOT NULL, -- pending, picked_up, cancelled, no_show
+  price DECIMAL(10, 2) NOT NULL,
+  commission DECIMAL(10, 2) NOT NULL,
+restaurant_earningsDECIMAL(10, 2) NOT NULL,
+pickup_date DATE NOT NULL,
+pickup_start_time TIME NOT NULL,
+pickup_end_time TIME NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+picked_up_at TIMESTAMP,
+cancelled_at TIMESTAMP,
+cancellation_reason TEXT,
+  INDEX idx_user_id (user_id),
+  INDEX idx_restaurant_id (restaurant_id),
+  INDEX idx_reservation_code (reservation_code),
+  INDEX idx_status (status),
+  INDEX idx_pickup_date (pickup_date)
+);
+Sample row:
+json
+{
+  "id": 1001,
+  "listing_id": 123,
+  "user_id": 456,
+  "restaurant_id": 789,
+  "reservation_code": "SB-1234",
+  "qr_code_url": "https://s3.../qr-sb1234.png",
+  "status": "picked_up",
+  "price": 99.00,
+  "commission": 29.70,
+  "restaurant_earnings": 69.30,
+  "pickup_date": "2026-03-05",
+  "pickup_start_time": "20:00:00",
+  "pickup_end_time": "21:00:00",
+  "created_at": "2026-03-05T16:00:00Z",
+  "picked_up_at": "2026-03-05T20:15:00Z"
+}
+
+Table: ratings
+sql
+CREATE TABLE ratings (
+  id SERIAL PRIMARY KEY,
+reservation_id INT NOT NULL REFERENCES reservations(id) ON DELETE CASCADE,
+user_id INT NOT NULL REFERENCES users(id),
+restaurant_id INT NOT NULL REFERENCES restaurants(id),
+  stars INT NOT NULL CHECK (stars >= 1 AND stars <= 5),
+  tags TEXT[], -- ['great_value', 'fresh', 'good_portion']
+  feedback TEXT,
+photo_url TEXT,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_reservation_id (reservation_id),
+  INDEX idx_restaurant_id (restaurant_id),
+  INDEX idx_stars (stars)
+);
+Sample row:
+json
+{
+  "id": 2001,
+  "reservation_id": 1001,
+  "user_id": 456,
+  "restaurant_id": 789,
+  "stars": 5,
+  "tags": ["great_value", "fresh", "tasty"],
+  "feedback": "Amazing! Got 3 huge pizza slices + garlic bread. Totally worth it!",
+  "photo_url": "https://s3.../rating-2001.jpg",
+  "created_at": "2026-03-05T21:00:00Z"
+}
+
+Table: transactions (Financial Ledger)
+sql
+CREATE TABLE transactions (
+  id SERIAL PRIMARY KEY,
+reservation_id INT REFERENCES reservations(id),
+restaurant_id INT REFERENCES restaurants(id),
+user_id INT REFERENCES users(id),
+  type VARCHAR(50) NOT NULL, -- reservation_payment, commission, payout, refund
+  amount DECIMAL(10, 2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'INR',
+  status VARCHAR(20) NOT NULL, -- pending, completed, failed
+payment_methodVARCHAR(50), -- cash, upi, card
+reference_idVARCHAR(100), -- External payment gateway reference
+  notes TEXT,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+completed_at TIMESTAMP,
+  INDEX idx_restaurant_id (restaurant_id),
+  INDEX idx_user_id (user_id),
+  INDEX idx_type (type),
+  INDEX idx_status (status)
+);
+Sample row:
+json
+{
+  "id": 3001,
+  "reservation_id": 1001,
+  "restaurant_id": 789,
+  "type": "reservation_payment",
+  "amount": 99.00,
+  "status": "completed",
+  "payment_method": "cash",
+  "created_at": "2026-03-05T20:15:00Z",
+  "completed_at": "2026-03-05T20:15:00Z"
+}
+
+Table: notifications
+sql
+CREATE TABLE notifications (
+  id SERIAL PRIMARY KEY,
+user_id INT REFERENCES users(id) ON DELETE CASCADE,
+restaurant_id INT REFERENCES restaurants(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL, -- reservation_confirmed, pickup_reminder, new_boxes, etc.
+  title VARCHAR(200) NOT NULL,
+  body TEXT NOT NULL,
+  data JSONB, -- Additional payload {reservationId, etc.}
+is_read BOOLEAN DEFAULT FALSE,
+sent_viaVARCHAR(50), -- push, whatsapp, email
+sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+read_at TIMESTAMP,
+  INDEX idx_user_id (user_id),
+  INDEX idx_restaurant_id (restaurant_id),
+  INDEX idx_type (type),
+  INDEX idx_is_read (is_read)
+);
+```
+
+---
+
+## 7.2 Redis Data Structures
+
+**Purpose:** Fast caching, real-time availability, session storage
+
+### Key Patterns:
+```
+1. Listing Availability (String)
+   Key: listing:{listingId}:available
+   Value: 2 (quantity available)
+   TTL: 21600 sec (6 hours)
+
+   Example:
+   SET listing:123:available 2
+   EXPIRE listing:123:available 21600
+
+2. Geospatial Index (Geo)
+   Key: listings:geo
+   Members: {listingId}
+   Coordinates: {longitude, latitude}
+
+   Example:
+   GEOADD listings:geo 75.1240 15.3647 123
+   GEORADIUS listings:geo 75.1240 15.3647 5 km WITHDIST
+
+3. User Sessions (Hash)
+   Key: session:{userId}
+   Fields: {token, fcmToken, lastActive, etc.}
+   TTL: 2592000 sec (30 days)
+
+   Example:
+   HSET session:456 token "jwt_token_abc"
+   HSET session:456 lastActive "2026-03-05T16:00:00Z"
+   EXPIRE session:456 2592000
+
+4. Real-time Reservations Counter (String)
+   Key: listing:{listingId}:reserved_count
+   Value: 3 (number of reservations)
+
+   Example:
+   INCR listing:123:reserved_count
+   GET listing:123:reserved_count
+
+5. Rate Limiting (String)
+   Key: ratelimit:{userId}:{endpoint}
+   Value: 5 (requests made)
+   TTL: 60 sec
+
+   Example:
+   INCR ratelimit:456:POST_reservations
+   EXPIRE ratelimit:456:POST_reservations 60
+   GET ratelimit:456:POST_reservations
+
+8. API SPECIFICATIONS
+8.1 RESTful API Endpoints
+Base URL: https://api.surprisebox.in/v1
+Authentication: Bearer JWT token in Authorization header
+
+Authentication Endpoints
+POST /auth/send-otp
+Send OTP to phone number for signup/login.
+Request:
+json
+{
+  "phone": "+919876543210"
+}
+Response:
+json
+{
+  "success": true,
+  "message": "OTP sent successfully",
+  "verificationId": "verify_abc123",
+  "expiresIn": 300
+}
+Errors:
+400 Invalid phone format
+429 Too many requests (rate limited)
+
+POST /auth/verify-otp
+Verify OTP and get JWT token.
+Request:
+json
+{
+  "phone": "+919876543210",
+  "otp": "123456",
+  "verificationId": "verify_abc123"
+}
+Response (Existing User):
+json
+{
+  "success": true,
+  "isNewUser": false,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 456,
+    "phone": "+919876543210",
+    "name": "Priya Mehta",
+    "email": "priya@example.com"
+  }
+}
+Response (New User):
+json
+{
+  "success": true,
+  "isNewUser": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": 457,
+    "phone": "+919123456789",
+    "name": null
+  }
+}
+```
+
+**Errors:**
+- `400` Invalid OTP
+- `401` OTP expired
+- `404` Verification ID not found
+
+---
+
+### User Endpoints
+
+#### `GET /users/me`
+
+Get current user profile.
+
+**Headers:**
+```
+Authorization: Bearer {token}
+Response:
+json
+{
+  "id": 456,
+  "phone": "+919876543210",
+  "name": "Priya Mehta",
+  "email": "priya@example.com",
+  "profilePhotoUrl": "https://s3.../profile456.jpg",
+  "preferences": {
+    "notifications": {
+      "push": true,
+      "whatsapp": true
+    },
+    "dietary": ["vegetarian"]
+  },
+  "createdAt": "2026-02-01T10:30:00Z"
+}
+
+PUT /users/me
+Update user profile.
+Request:
+json
+{
+  "name": "Priya Mehta",
+  "email": "priya.new@example.com",
+  "dateOfBirth": "1998-05-15",
+  "preferences": {
+    "notifications": {
+      "push": true,
+      "whatsapp": false
+    }
+  }
+}
+Response:
+json
+{
+  "success": true,
+  "user": {
+    "id": 456,
+    "name": "Priya Mehta",
+    "email": "priya.new@example.com",
+    ...
+  }
+}
+```
+
+---
+
+### Listing Endpoints (Boxes)
+
+#### `GET /listings`
+
+Get available boxes near user.
+
+**Query Parameters:**
+- `lat` (required): Latitude
+- `lon` (required): Longitude
+- `radius` (optional): Radius in km (default: 5)
+- `cuisine` (optional): Filter by cuisine type
+- `maxPrice` (optional): Maximum price
+- `sortBy` (optional): `distance`, `price`, `rating` (default: distance)
+
+**Example:**
+```
+GET /listings?lat=15.3647&lon=75.1240&radius=5&sortBy=distance
+Response:
+json
+{
+  "success": true,
+  "count": 8,
+  "listings": [
+    {
+      "id": 123,
+      "restaurant": {
+        "id": 789,
+        "name": "Pizza Corner",
+        "cuisineTypes": ["Italian", "Fast Food"],
+        "averageRating": 4.5,
+        "totalRatings": 125,
+        "logoUrl": "https://s3.../logo.jpg",
+        "address": "Camp Road, Vidyanagar",
+        "latitude": 15.3647,
+        "longitude": 75.1240,
+        "distance": 1.2
+      },
+      "quantityAvailable": 3,
+      "price": 99.00,
+      "regularValue": 300.00,
+      "description": "Pizza slices, garlic bread, pasta",
+      "pickupDate": "2026-03-05",
+      "pickupStartTime": "20:00:00",
+      "pickupEndTime": "21:00:00",
+      "allergens": ["gluten", "dairy"]
+    },
+    ...
+  ]
+}
+Errors:
+400 Missing lat/lon
+404 No boxes found in radius
+
+GET /listings/{id}
+Get details of a specific listing.
+Response:
+json
+{
+  "success": true,
+  "listing": {
+    "id": 123,
+    "restaurant": {
+      "id": 789,
+      "name": "Pizza Corner",
+      "cuisineTypes": ["Italian", "Fast Food"],
+      "averageRating": 4.5,
+      "totalRatings": 125,
+      "logoUrl": "https://s3.../logo.jpg",
+      "coverPhotoUrl": "https://s3.../cover.jpg",
+      "description": "Authentic Italian pizza & pasta",
+      "address": "Camp Road, opp. HDFC Bank, Vidyanagar, Hubli - 580021",
+      "latitude": 15.3647,
+      "longitude": 75.1240,
+      "phone": "+919123456789"
+    },
+    "quantityTotal": 5,
+    "quantityAvailable": 3,
+    "price": 99.00,
+    "regularValue": 300.00,
+    "description": "Pizza slices, garlic bread, pasta, dessert",
+    "pickupDate": "2026-03-05",
+    "pickupStartTime": "20:00:00",
+    "pickupEndTime": "21:00:00",
+    "allergens": ["gluten", "dairy"],
+    "createdAt": "2026-03-05T15:30:00Z"
+  }
+}
+
+Reservation Endpoints
+POST /reservations
+Create a new reservation.
+Request:
+json
+{
+  "listingId": 123
+}
+Response:
+json
+{
+  "success": true,
+  "reservation": {
+    "id": 1001,
+    "code": "SB-1234",
+    "qrCodeUrl": "https://s3.../qr-sb1234.png",
+    "listing": {
+      "id": 123,
+      "restaurant": {
+        "name": "Pizza Corner",
+        "address": "Camp Road, Vidyanagar",
+        "phone": "+919123456789"
+      },
+      "price": 99.00,
+      "pickupDate": "2026-03-05",
+      "pickupStartTime": "20:00:00",
+      "pickupEndTime": "21:00:00"
+    },
+    "status": "pending",
+    "createdAt": "2026-03-05T16:00:00Z"
+  }
+}
+```
+
+**Errors:**
+- `400` Invalid listing ID
+- `404` Listing not found
+- `409` Listing sold out
+- `429` User already has reservation for this time
+
+---
+
+#### `GET /reservations`
+
+Get user's reservations.
+
+**Query Parameters:**
+- `status` (optional): `active`, `completed`, `cancelled`
+- `page` (optional): Page number (default: 1)
+- `limit` (optional): Items per page (default: 20)
+
+**Example:**
+```
+GET /reservations?status=active
+Response:
+json
+{
+  "success": true,
+  "count": 2,
+  "page": 1,
+  "totalPages": 1,
+  "reservations": [
+    {
+      "id": 1001,
+      "code": "SB-1234",
+      "qrCodeUrl": "https://s3.../qr-sb1234.png",
+      "restaurant": {
+        "id": 789,
+        "name": "Pizza Corner",
+        "address": "Camp Road, Vidyanagar",
+        "latitude": 15.3647,
+        "longitude": 75.1240,
+        "phone": "+919123456789"
+      },
+      "price": 99.00,
+      "pickupDate": "2026-03-05",
+      "pickupStartTime": "20:00:00",
+      "pickupEndTime": "21:00:00",
+      "status": "pending",
+      "createdAt": "2026-03-05T16:00:00Z",
+      "canCancel": true
+    },
+    ...
+  ]
+}
+
+PUT /reservations/{id}/cancel
+Cancel a reservation.
+Response:
+json
+{
+  "success": true,
+  "message": "Reservation cancelled successfully",
+  "refund": 0, // Or amount if applicable
+  "reservation": {
+    "id": 1001,
+    "status": "cancelled",
+    "cancelledAt": "2026-03-05T17:00:00Z"
+  }
+}
+Errors:
+400 Cannot cancel (too late)
+404 Reservation not found
+403 Not your reservation
+
+Rating Endpoints
+POST /ratings
+Submit a rating for a reservation.
+Request:
+json
+{
+  "reservationId": 1001,
+  "stars": 5,
+  "tags": ["great_value", "fresh", "tasty"],
+  "feedback": "Amazing! Got 3 huge pizza slices + garlic bread.",
+  "photoUrl": "https://s3.../rating-photo.jpg"
+}
+Response:
+json
+{
+  "success": true,
+  "rating": {
+    "id": 2001,
+    "reservationId": 1001,
+    "stars": 5,
+    "tags": ["great_value", "fresh", "tasty"],
+    "feedback": "Amazing! Got 3 huge pizza slices + garlic bread.",
+    "photoUrl": "https://s3.../rating-photo.jpg",
+    "createdAt": "2026-03-05T21:00:00Z"
+  },
+  "restaurantRating": {
+    "newAverage": 4.52,
+    "totalRatings": 126
+  }
+}
+
+Restaurant Partner Endpoints
+POST /partners/listings
+Create a new listing (restaurant only).
+Request:
+json
+{
+  "quantityTotal": 5,
+  "price": 99.00,
+  "regularValue": 300.00,
+  "description": "Pizza slices, garlic bread, pasta, dessert",
+  "pickupDate": "2026-03-05",
+  "pickupStartTime": "20:00",
+  "pickupEndTime": "21:00",
+  "allergens": ["gluten", "dairy"]
+}
+Response:
+json
+{
+  "success": true,
+Continue
+10:58 PM
+"listing": { "id": 123, "restaurantId": 789, "quantityTotal": 5, "quantityAvailable": 5, "price": 99.00, "regularValue": 300.00, "description": "Pizza slices, garlic bread, pasta, dessert", "pickupDate": "2026-03-05", "pickupStartTime": "20:00:00", "pickupEndTime": "21:00:00", "createdAt": "2026-03-05T15:30:00Z", "isActive": true } }
+
+---
+
+#### `GET /partners/reservations`
+
+Get restaurant's reservations.
+
+**Query Parameters:**
+- `status`: `pending`, `picked_up`, `no_show`
+- `date`: Filter by date (YYYY-MM-DD)
+
+**Example:**
+GET /partners/reservations?status=pending&date=2026-03-05
+
+**Response:**
+```json
+{
+  "success": true,
+  "count": 3,
+  "reservations": [
+    {
+      "id": 1001,
+      "code": "SB-1234",
+      "customer": {
+        "name": "Priya M.",
+        "phone": "+919876543210"
+      },
+      "price": 99.00,
+      "restaurantEarnings": 69.30,
+      "pickupStartTime": "20:00:00",
+      "pickupEndTime": "21:00:00",
+      "status": "pending",
+      "createdAt": "2026-03-05T16:00:00Z"
+    },
+    ...
+  ]
+}
+```
+
+---
+
+#### `PUT /partners/reservations/{id}/pickup`
+
+Mark reservation as picked up.
+
+**Request:**
+```json
+{
+  "code": "SB-1234" // For verification
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Pickup confirmed",
+  "reservation": {
+    "id": 1001,
+    "status": "picked_up",
+    "pickedUpAt": "2026-03-05T20:15:00Z"
+  },
+  "earnings": {
+    "thisReservation": 69.30,
+    "todayTotal": 280.20
+  }
+}
+```
+
+---
+
+#### `GET /partners/dashboard`
+
+Get today's dashboard summary.
+
+**Response:**
+```json
+{
+  "success": true,
+  "summary": {
+    "date": "2026-03-05",
+    "boxesListed": 5,
+    "boxesSold": 4,
+    "boxesPickedUp": 3,
+    "boxesPending": 1,
+    "revenue": 280.20,
+    "commission": 118.80,
+    "earnings": 280.20
+  },
+  "upcomingPickups": [
+    {
+      "reservationId": 1004,
+      "code": "SB-1237",
+      "customerName": "Amit K.",
+      "expectedTime": "20:45:00"
+    }
+  ]
+}
+```
+
+---
+
+#### `GET /partners/earnings`
+
+Get earnings report.
+
+**Query Parameters:**
+- `period`: `today`, `week`, `month`, `custom`
+- `startDate`: Start date (for custom)
+- `endDate`: End date (for custom)
+
+**Example:**
+GET /partners/earnings?period=week
+
+**Response:**
+```json
+{
+  "success": true,
+  "period": "week",
+  "startDate": "2026-03-03",
+  "endDate": "2026-03-09",
+  "totalEarnings": 1960.00,
+  "totalCommission": 840.00,
+  "totalBoxesSold": 28,
+  "breakdown": [
+    {
+      "date": "2026-03-03",
+      "boxesSold": 4,
+      "revenue": 396.00,
+      "commission": 118.80,
+      "earnings": 277.20
+    },
+    ...
+  ],
+  "averageRating": 4.6,
+  "sellThroughRate": 0.93
+}
+```
+
+---
+
+## 8.2 WebSocket Events
+
+**Connection:** `wss://api.surprisebox.in/ws`
+
+**Authentication:** Send JWT token on connection
+
+### Client → Server Events
+
+#### `subscribe_listings`
+
+Subscribe to listing updates in a specific area.
+
+**Payload:**
+```json
+{
+  "event": "subscribe_listings",
+  "data": {
+    "latitude": 15.3647,
+    "longitude": 75.1240,
+    "radius": 5
+  }
+}
+```
+
+#### `subscribe_reservation`
+
+Subscribe to updates for a specific reservation.
+
+**Payload:**
+```json
+{
+  "event": "subscribe_reservation",
+  "data": {
+    "reservationId": 1001
+  }
+}
+```
+
+---
+
+### Server → Client Events
+
+#### `listing_updated`
+
+Sent when a listing's availability changes.
+
+**Payload:**
+```json
+{
+  "event": "listing_updated",
+  "data": {
+    "listingId": 123,
+    "quantityAvailable": 2,
+    "updatedAt": "2026-03-05T16:30:00Z"
+  }
+}
+```
+
+#### `listing_sold_out`
+
+Sent when a listing sells out.
+
+**Payload:**
+```json
+{
+  "event": "listing_sold_out",
+  "data": {
+    "listingId": 123,
+    "soldOutAt": "2026-03-05T17:00:00Z"
+  }
+}
+```
+
+#### `new_reservation`
+
+Sent to restaurant when new reservation is made.
+
+**Payload:**
+```json
+{
+  "event": "new_reservation",
+  "data": {
+    "reservationId": 1001,
+    "code": "SB-1234",
+    "customerName": "Priya M.",
+    "expectedTime": "20:15:00"
+  }
+}
+```
+
+#### `reservation_cancelled`
+
+Sent to restaurant when customer cancels.
+
+**Payload:**
+```json
+{
+  "event": "reservation_cancelled",
+  "data": {
+    "reservationId": 1001,
+    "code": "SB-1234",
+    "cancelledAt": "2026-03-05T17:00:00Z"
+  }
+}
+```
+
+---
+

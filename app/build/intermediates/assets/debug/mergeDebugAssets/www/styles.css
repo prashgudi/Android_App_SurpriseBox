@@ -1,0 +1,274 @@
+:root {
+  --bg: #fff7ed;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #4b5563;
+  --primary: #f97316;
+  --primary-dark: #c2410c;
+  --success: #15803d;
+  --line: #e5e7eb;
+  --shadow: 0 14px 40px rgba(15, 23, 42, 0.12);
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: linear-gradient(180deg, #ffedd5 0%, #fff7ed 35%, #ffffff 100%);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--text);
+}
+
+#app {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 14px 14px 100px;
+}
+
+.brand {
+  padding: 8px 0 2px;
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: 0.2px;
+}
+
+.subtitle {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid #f1f5f9;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  margin-top: 12px;
+}
+
+.hero {
+  background: radial-gradient(circle at top right, #fdba74, #f97316 60%, #c2410c);
+  color: #fff;
+}
+
+.hero p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.slide {
+  min-height: 310px;
+}
+
+.slide h2 {
+  margin: 4px 0 8px;
+}
+
+.dot-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.dot.active {
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.stack {
+  display: grid;
+  gap: 10px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 0.82rem;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  background: #fff7ed;
+  border-radius: 999px;
+  padding: 4px 10px;
+  margin-right: 6px;
+  margin-top: 6px;
+}
+
+.value-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+}
+
+.value-line strong {
+  color: #0f172a;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 11px;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.btn {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(160deg, var(--primary) 0%, #ea580c 80%);
+  color: #fff;
+}
+
+.btn-primary:active {
+  background: var(--primary-dark);
+}
+
+.btn-outline {
+  background: #fff;
+  border: 1px solid #d1d5db;
+  color: #334155;
+}
+
+.btn-success {
+  background: #15803d;
+  color: #fff;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.box-card h3 {
+  margin: 0;
+}
+
+.box-card .price {
+  color: #9a3412;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.box-card .worth {
+  color: #64748b;
+}
+
+.section-title {
+  margin: 16px 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 14px;
+  margin: -14px -14px 8px;
+  backdrop-filter: blur(8px);
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-width: 540px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  padding: 10px;
+  gap: 8px;
+}
+
+.nav-btn {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 8px;
+  background: #fff;
+  font-weight: 600;
+  font-size: 0.84rem;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-btn.active {
+  border-color: #fb923c;
+  color: #9a3412;
+  background: #fff7ed;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  background: #fff;
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  padding: 16px;
+  box-shadow: 0 -14px 40px rgba(15, 23, 42, 0.2);
+}
+
+.hidden {
+  display: none;
+}
+
+.success-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 900;
+  font-size: 1.4rem;
+}
