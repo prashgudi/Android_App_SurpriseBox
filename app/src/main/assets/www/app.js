@@ -12,7 +12,8 @@ const STORAGE = {
   webSocketUrl: "sb_ws_url",
   reservationRatings: "sb_reservation_ratings",
   supportTickets: "sb_support_tickets",
-  supportCredits: "sb_support_credits"
+  supportCredits: "sb_support_credits",
+  partnerApplication: "sb_partner_application"
 };
 
 const DEFAULT_API_BASE_URL = "https://api.surprisebox.in/v1";
@@ -50,6 +51,20 @@ function createDefaultPartnerListingDraft() {
   };
 }
 
+function createDefaultPartnerApplicationDraft() {
+  return {
+    restaurantName: "",
+    ownerName: "",
+    phone: "",
+    email: "",
+    address: "",
+    city: "",
+    fssai: "",
+    payoutUpi: "",
+    documents: []
+  };
+}
+
 const state = {
   route: "onboarding",
   onboardingIndex: 0,
@@ -61,6 +76,7 @@ const state = {
   activeListing: null,
   lastReservationId: null,
   partnerListingDraft: createDefaultPartnerListingDraft(),
+  partnerApplicationDraft: createDefaultPartnerApplicationDraft(),
   filters: {
     radius: "5",
     cuisine: "all",
@@ -83,12 +99,16 @@ let partnerReservations = [];
 let partnerListings = [];
 let partnerLedger = null;
 let partnerContext = loadJSON(STORAGE.partnerContext, null);
+let adminPartners = [];
+let adminPartnerEdits = {};
+let adminPartnerNotes = {};
 let notifications = loadJSON(STORAGE.notifications, []);
 let notificationPrefs = loadNotificationPrefs();
 let pushToken = localStorage.getItem(STORAGE.pushToken) || "";
 let reservationRatings = loadJSON(STORAGE.reservationRatings, {});
 let supportTickets = loadJSON(STORAGE.supportTickets, []);
 let supportCredits = Number(localStorage.getItem(STORAGE.supportCredits) || "0");
+let partnerApplication = loadJSON(STORAGE.partnerApplication, null);
 let livePollTimerId = null;
 let liveSyncInFlight = false;
 let liveSocket = null;
@@ -156,6 +176,24 @@ function isPartnerSession() {
 
 function isPartnerLoginMode() {
   return state.loginMode === "partner";
+}
+
+function isAdminSession() {
+  return state.sessionRole === "admin";
+}
+
+function normalizeRole(value) {
+  const role = String(value || "").trim().toLowerCase();
+  if (role === "admin") return "admin";
+  return role === "partner" ? "partner" : "customer";
+}
+
+function normalizeLoginMode(value) {
+  return value === "partner" ? "partner" : "customer";
+}
+
+function shouldShowRoleToggle() {
+  return isMockOtpModeEnabled();
 }
 
 function setLoginMode(mode) {
@@ -244,6 +282,12 @@ function formatPaymentStatus(status) {
   return "Pending";
 }
 
+function formatApplicationStatus(status) {
+  const normalized = String(status || "submitted").replaceAll("_", " ").toLowerCase();
+  if (!normalized) return "Submitted";
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
 function isReservationRateable(reservation) {
   const status = String(reservation?.status || "").toLowerCase();
   return status === "picked_up" || status === "completed" || status === "delivered";
@@ -318,6 +362,58 @@ function mapPartnerLedger(raw) {
   };
 }
 
+function mapAdminPartner(raw) {
+  return {
+    id: raw?.id || raw?.partnerId || "",
+    restaurantName: raw?.restaurantName || raw?.name || "Partner",
+    phone: raw?.phone || raw?.contactPhone || "",
+    address: raw?.address || "",
+    status: String(raw?.status || "submitted").toLowerCase(),
+    commissionRate: Number(raw?.commissionRate ?? raw?.commission ?? 0),
+    payoutCycle: raw?.payoutCycle || raw?.payout || "weekly",
+    zone: raw?.zone || raw?.city || "",
+    reviewNotes: raw?.reviewNotes || raw?.notes || "",
+    statusHistory: Array.isArray(raw?.statusHistory)
+      ? raw.statusHistory
+      : (Array.isArray(raw?.history) ? raw.history : []),
+    createdAt: raw?.createdAt || new Date().toISOString()
+  };
+}
+
+function getAdminPartnerEdit(partnerId) {
+  if (!partnerId) return null;
+  if (!adminPartnerEdits[partnerId]) {
+    adminPartnerEdits[partnerId] = {
+      commissionRate: "",
+      payoutCycle: "",
+      zone: ""
+    };
+  }
+  return adminPartnerEdits[partnerId];
+}
+
+function updateAdminPartnerEdit(partnerId, key, value) {
+  if (!partnerId) return;
+  const edit = getAdminPartnerEdit(partnerId);
+  if (!edit) return;
+  edit[key] = String(value ?? "");
+}
+
+function updateAdminPartnerNote(partnerId, value) {
+  if (!partnerId) return;
+  adminPartnerNotes[partnerId] = String(value ?? "");
+}
+
+function computeAdminSummary(partners = []) {
+  const summary = { submitted: 0, under_review: 0, approved: 0, live: 0, rejected: 0, suspended: 0 };
+  partners.forEach((partner) => {
+    const status = String(partner?.status || "submitted").toLowerCase();
+    if (summary[status] !== undefined) summary[status] += 1;
+    else summary.submitted += 1;
+  });
+  return summary;
+}
+
 function isActivePartnerReservationStatus(status) {
   return PARTNER_ACTIVE_STATUSES.includes(String(status || "").toLowerCase());
 }
@@ -385,6 +481,44 @@ function seedMockPartnerData() {
   partnerLedger = buildPartnerLedger(partnerReservations);
 }
 
+function seedMockAdminData() {
+  if (adminPartners.length > 0) return;
+  adminPartners = [
+    {
+      id: "P-1001",
+      restaurantName: "Sunrise Bakery",
+      phone: "+91 9876543210",
+      address: "Indiranagar, Bengaluru",
+      status: "under_review",
+      commissionRate: 0.25,
+      payoutCycle: "weekly",
+      zone: "Indiranagar",
+      reviewNotes: "Awaiting FSSAI copy.",
+      statusHistory: [
+        { status: "submitted", at: new Date(Date.now() - 86400000).toISOString() },
+        { status: "under_review", at: new Date().toISOString() }
+      ],
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: "P-1002",
+      restaurantName: "Spice Route Kitchen",
+      phone: "+91 9123456780",
+      address: "Koramangala, Bengaluru",
+      status: "approved",
+      commissionRate: 0.28,
+      payoutCycle: "daily",
+      zone: "Koramangala",
+      reviewNotes: "Approved. Schedule onboarding call.",
+      statusHistory: [
+        { status: "submitted", at: new Date(Date.now() - 172800000).toISOString() },
+        { status: "approved", at: new Date(Date.now() - 3600000).toISOString() }
+      ],
+      createdAt: new Date().toISOString()
+    }
+  ];
+}
+
 function normalizeApiBaseUrl(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
@@ -445,6 +579,14 @@ function saveNotificationPrefs() {
 
 function saveNotifications() {
   saveJSON(STORAGE.notifications, notifications);
+}
+
+function savePartnerApplication() {
+  if (!partnerApplication) {
+    localStorage.removeItem(STORAGE.partnerApplication);
+    return;
+  }
+  saveJSON(STORAGE.partnerApplication, partnerApplication);
 }
 
 function saveSupportState() {
@@ -767,7 +909,7 @@ function computePartnerReservationsSignature(items) {
 }
 
 async function runLiveSync() {
-  if (!authToken || isMockOtpModeEnabled() || !notificationPrefs.liveUpdates || liveSyncInFlight) return;
+  if (!authToken || isMockOtpModeEnabled() || isAdminSession() || !notificationPrefs.liveUpdates || liveSyncInFlight) return;
   liveSyncInFlight = true;
   try {
     if (isPartnerSession()) {
@@ -1058,7 +1200,7 @@ function setApiBaseUrl(url) {
 function saveSession() {
   if (user) saveJSON(STORAGE.user, user);
   if (authToken) localStorage.setItem(STORAGE.token, authToken);
-  localStorage.setItem(STORAGE.sessionRole, state.sessionRole || "customer");
+  localStorage.setItem(STORAGE.sessionRole, normalizeRole(user?.role || state.sessionRole));
   if (isPartnerSession() && partnerContext) {
     saveJSON(STORAGE.partnerContext, partnerContext);
   } else {
@@ -1077,6 +1219,9 @@ function clearSession() {
   partnerListings = [];
   partnerLedger = null;
   partnerContext = null;
+  adminPartners = [];
+  adminPartnerEdits = {};
+  adminPartnerNotes = {};
   state.sessionRole = "customer";
   state.loginMode = "customer";
   state.lastLiveSyncAt = 0;
@@ -1097,9 +1242,13 @@ function resetRuntimeData() {
   partnerListings = [];
   partnerLedger = null;
   partnerContext = null;
+  adminPartners = [];
+  adminPartnerEdits = {};
+  adminPartnerNotes = {};
   state.pendingPhone = "";
   state.verificationId = "";
   state.partnerListingDraft = createDefaultPartnerListingDraft();
+  state.partnerApplicationDraft = createDefaultPartnerApplicationDraft();
 }
 
 function startBusy(text) {
@@ -1323,6 +1472,57 @@ async function apiCreateReservation(listingId, paymentMethod = DEFAULT_PAYMENT_M
   }
 }
 
+async function apiSubmitPartnerApplication(payload) {
+  const attempts = [
+    () => apiRequest("/partners/applications", { method: "POST", body: payload }),
+    () => apiRequest("/partners/apply", { method: "POST", body: payload }),
+    () => apiRequest("/partners/onboarding", { method: "POST", body: payload })
+  ];
+  let lastError = null;
+  for (const attempt of attempts) {
+    try {
+      return await attempt();
+    } catch (error) {
+      lastError = error;
+      if (!shouldTryPartnerFallback(error)) throw error;
+    }
+  }
+  if (lastError) throw lastError;
+}
+
+async function apiRequestUploadUrl(payload) {
+  return apiRequest("/uploads/presign", { method: "POST", body: payload });
+}
+
+async function uploadFileToPresignedUrl(url, file) {
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": file.type || "application/octet-stream" },
+    body: file
+  });
+  if (!response.ok) {
+    throw new Error(`Upload failed (${response.status})`);
+  }
+}
+
+async function apiGetPartnerApplicationStatus() {
+  const attempts = [
+    () => apiRequest("/partners/applications/me", { tokenRequired: true }),
+    () => apiRequest("/partners/application", { tokenRequired: true }),
+    () => apiRequest("/partners/applications/status", { tokenRequired: true })
+  ];
+  let lastError = null;
+  for (const attempt of attempts) {
+    try {
+      return await attempt();
+    } catch (error) {
+      lastError = error;
+      if (!shouldTryPartnerFallback(error)) throw error;
+    }
+  }
+  if (lastError) throw lastError;
+}
+
 async function apiGetReservations() {
   return apiRequest("/reservations", {
     tokenRequired: true,
@@ -1449,6 +1649,19 @@ async function apiConfirmPartnerPickup(reservationId) {
       tokenRequired: true
     });
   }
+}
+
+async function apiGetAdminPartners() {
+  return apiRequest("/admin/partners", { tokenRequired: true, query: { page: 1, limit: 50 } });
+}
+
+async function apiUpdateAdminPartnerStatus(partnerId, payload) {
+  if (!partnerId) throw new Error("Partner ID missing.");
+  return apiRequest(`/admin/partners/${partnerId}`, {
+    method: "PUT",
+    tokenRequired: true,
+    body: payload
+  });
 }
 
 async function apiGetPartnerLedger() {
@@ -1598,6 +1811,18 @@ function renderPartnerBottomNav(active) {
   `;
 }
 
+function renderAdminBottomNav(active) {
+  if (!user) return "";
+  const notificationLabel = notifications.length ? `Updates (${notifications.length})` : "Updates";
+  return `
+    <div class="bottom-nav">
+      <button class="nav-btn ${active === "admin_dashboard" ? "active" : ""}" onclick="navigate('admin_dashboard')">Admin</button>
+      <button class="nav-btn ${active === "admin_partners" ? "active" : ""}" onclick="navigate('admin_partners')">Approvals</button>
+      <button class="nav-btn ${active === "notifications" ? "active" : ""}" onclick="navigate('notifications')">${notificationLabel}</button>
+    </div>
+  `;
+}
+
 function renderStatusCard() {
   if (state.busy) {
     return `<div class="card muted">${escapeHtml(state.busyText)}</div>`;
@@ -1647,21 +1872,44 @@ function renderOnboarding() {
 
 function renderPhoneAuth() {
   const mockEnabled = isMockOtpModeEnabled();
+  const showToggle = shouldShowRoleToggle();
+  const subtitle = showToggle
+    ? (isPartnerLoginMode() ? "Partner login via phone OTP" : "Sign up with your phone number")
+    : "Sign in with your phone number";
+  const applicationStatus = partnerApplication ? formatApplicationStatus(partnerApplication.status) : "";
   return `
-    ${renderTopNav("Welcome", isPartnerLoginMode() ? "Partner login via phone OTP" : "Sign up with your phone number")}
+    ${renderTopNav("Welcome", subtitle)}
     ${renderStatusCard()}
-    <div class="card stack">
-      <label class="muted">Login as</label>
-      <div class="row">
-        <button class="btn ${state.loginMode === "customer" ? "btn-primary" : "btn-outline"} btn-block" onclick="setLoginMode('customer')">Customer</button>
-        <button class="btn ${state.loginMode === "partner" ? "btn-primary" : "btn-outline"} btn-block" onclick="setLoginMode('partner')">Partner</button>
-      </div>
-      <div class="muted">${isPartnerLoginMode() ? "Use your registered restaurant phone number." : "Use your customer phone number."}</div>
-    </div>
+    ${showToggle
+      ? `
+        <div class="card stack">
+          <label class="muted">Login as (mock only)</label>
+          <div class="row">
+            <button class="btn ${state.loginMode === "customer" ? "btn-primary" : "btn-outline"} btn-block" onclick="setLoginMode('customer')">Customer</button>
+            <button class="btn ${state.loginMode === "partner" ? "btn-primary" : "btn-outline"} btn-block" onclick="setLoginMode('partner')">Partner</button>
+          </div>
+          <div class="muted">${isPartnerLoginMode() ? "Use your registered restaurant phone number." : "Use your customer phone number."}</div>
+        </div>
+      `
+      : `
+        <div class="card muted">Your account type is determined after OTP verification and admin approval.</div>
+      `}
     <div class="card stack">
       <label class="muted">Phone number</label>
       <input id="phone" type="tel" placeholder="+91 9876543210" value="${escapeHtml(state.pendingPhone)}" />
       <button class="btn btn-primary btn-block" onclick="sendOtp()">Send OTP</button>
+    </div>
+    <div class="card stack">
+      <div class="section-title" style="margin:0;">Partner onboarding</div>
+      <div class="muted">Restaurant owners can apply here. Approval required before partner access.</div>
+      ${partnerApplication
+        ? `
+          <div class="value-line"><span>Status</span><strong>${escapeHtml(applicationStatus)}</strong></div>
+          <button class="btn btn-outline btn-block" onclick="navigate('partner_apply_status')">View Application</button>
+        `
+        : `
+          <button class="btn btn-outline btn-block" onclick="navigate('partner_apply')">Apply as Partner</button>
+        `}
     </div>
     <div class="card stack">
       <label class="muted">Backend API Base URL</label>
@@ -1937,6 +2185,149 @@ function renderSupport() {
   `;
 }
 
+function renderPartnerApplication() {
+  const draft = state.partnerApplicationDraft;
+  return `
+    ${renderTopNav("Partner Application", "Submit your restaurant details")}
+    ${renderStatusCard()}
+    <div class="card stack">
+      <label class="muted">Restaurant name</label>
+      <input type="text" value="${escapeHtml(draft.restaurantName)}" onchange="updatePartnerApplicationDraft('restaurantName', this.value)" />
+      <label class="muted">Owner name</label>
+      <input type="text" value="${escapeHtml(draft.ownerName)}" onchange="updatePartnerApplicationDraft('ownerName', this.value)" />
+      <label class="muted">Phone</label>
+      <input type="tel" value="${escapeHtml(draft.phone)}" onchange="updatePartnerApplicationDraft('phone', this.value)" />
+      <label class="muted">Email (optional)</label>
+      <input type="email" value="${escapeHtml(draft.email)}" onchange="updatePartnerApplicationDraft('email', this.value)" />
+      <label class="muted">Address</label>
+      <textarea rows="3" style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:11px;font-size:0.95rem;" onchange="updatePartnerApplicationDraft('address', this.value)">${escapeHtml(draft.address)}</textarea>
+      <label class="muted">City / Zone</label>
+      <input type="text" value="${escapeHtml(draft.city)}" onchange="updatePartnerApplicationDraft('city', this.value)" />
+      <label class="muted">FSSAI (optional)</label>
+      <input type="text" value="${escapeHtml(draft.fssai)}" onchange="updatePartnerApplicationDraft('fssai', this.value)" />
+      <label class="muted">Payout UPI (optional)</label>
+      <input type="text" value="${escapeHtml(draft.payoutUpi)}" onchange="updatePartnerApplicationDraft('payoutUpi', this.value)" />
+      <label class="muted">Upload documents</label>
+      <select id="partner-doc-type">
+        ${["fssai", "gst", "shop_photo", "menu", "other"].map((type) => `
+          <option value="${type}">${type.replaceAll("_", " ")}</option>
+        `).join("")}
+      </select>
+      <input type="file" accept="image/*,application/pdf" onchange="handlePartnerDocumentUpload(this)" />
+      ${Array.isArray(draft.documents) && draft.documents.length > 0 ? `
+        <div class="card" style="margin:0;">
+          ${draft.documents.map((doc, index) => `
+            <div class="value-line">
+              <span>${escapeHtml(doc.type)} • ${escapeHtml(doc.name)}</span>
+              <button class="btn btn-outline" onclick="removePartnerDocument(${index})">Remove</button>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="muted">No documents uploaded yet.</div>`}
+      <button class="btn btn-primary btn-block" onclick="submitPartnerApplication()">Submit Application</button>
+      <button class="btn btn-outline btn-block" onclick="navigate('auth_phone')">Back to Login</button>
+    </div>
+  `;
+}
+
+function renderPartnerApplicationStatus() {
+  if (!partnerApplication) {
+    return `
+      ${renderTopNav("Partner Application", "No application found")}
+      <div class="card muted">No partner application submitted yet.</div>
+      <button class="btn btn-outline btn-block" onclick="navigate('partner_apply')">Apply as Partner</button>
+      <button class="btn btn-outline btn-block" onclick="navigate('auth_phone')">Back to Login</button>
+    `;
+  }
+  return `
+    ${renderTopNav("Partner Application", "Application status")}
+    ${renderStatusCard()}
+    <div class="card stack">
+      <div class="value-line"><span>Restaurant</span><strong>${escapeHtml(partnerApplication.restaurantName)}</strong></div>
+      <div class="value-line"><span>Status</span><strong>${escapeHtml(formatApplicationStatus(partnerApplication.status))}</strong></div>
+      <div class="muted">${escapeHtml(partnerApplication.address || "")}</div>
+      <div class="muted">Submitted: ${new Date(partnerApplication.createdAt).toLocaleString()}</div>
+      <button class="btn btn-outline btn-block" onclick="navigate('auth_phone')">Back to Login</button>
+    </div>
+  `;
+}
+
+function renderAdminDashboard() {
+  const summary = computeAdminSummary(adminPartners);
+  return `
+    ${renderTopNav("Admin Console", "Partner approvals and operations")}
+    ${renderStatusCard()}
+    <div class="card stack">
+      <div class="value-line"><span>Submitted</span><strong>${summary.submitted}</strong></div>
+      <div class="value-line"><span>Under review</span><strong>${summary.under_review}</strong></div>
+      <div class="value-line"><span>Approved</span><strong>${summary.approved}</strong></div>
+      <div class="value-line"><span>Live</span><strong>${summary.live}</strong></div>
+      <div class="value-line"><span>Suspended</span><strong>${summary.suspended}</strong></div>
+      <button class="btn btn-outline btn-block" onclick="navigate('admin_partners')">Review Partner Applications</button>
+      <button class="btn btn-outline btn-block" onclick="refreshAdminPartners()">Refresh Admin Data</button>
+    </div>
+    ${renderAdminBottomNav("admin_dashboard")}
+  `;
+}
+
+function renderAdminPartners() {
+  const partners = adminPartners.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return `
+    ${renderTopNav("Partner Approvals", "Review and approve new partners")}
+    ${renderStatusCard()}
+    ${partners.length === 0 ? `<div class="card muted">No partner applications yet.</div>` : ""}
+    ${partners.map((partner) => {
+      const edit = getAdminPartnerEdit(partner.id);
+      const commissionValue = edit && edit.commissionRate !== ""
+        ? edit.commissionRate
+        : Math.round((partner.commissionRate || 0) * 100);
+      const payoutValue = edit && edit.payoutCycle !== "" ? edit.payoutCycle : partner.payoutCycle;
+      const zoneValue = edit && edit.zone !== "" ? edit.zone : partner.zone;
+      const noteValue = adminPartnerNotes[partner.id] !== undefined
+        ? adminPartnerNotes[partner.id]
+        : (partner.reviewNotes || "");
+      return `
+      <div class="card stack">
+        <div class="value-line"><span>${escapeHtml(partner.restaurantName)}</span><strong>${escapeHtml(partner.status)}</strong></div>
+        <div class="muted">${escapeHtml(partner.address)}</div>
+        <div class="muted">Phone: ${escapeHtml(partner.phone)}</div>
+        <label class="muted">Commission %</label>
+        <input type="number" min="0" max="50" value="${escapeHtml(commissionValue)}" onchange="updateAdminPartnerEdit('${escapeHtml(partner.id)}', 'commissionRate', this.value)" />
+        <label class="muted">Payout cycle</label>
+        <select onchange="updateAdminPartnerEdit('${escapeHtml(partner.id)}', 'payoutCycle', this.value)">
+          ${["daily", "weekly", "biweekly", "monthly"].map((cycle) => `
+            <option value="${cycle}" ${String(payoutValue || "").toLowerCase() === cycle ? "selected" : ""}>${cycle}</option>
+          `).join("")}
+        </select>
+        <label class="muted">Zone</label>
+        <input type="text" value="${escapeHtml(zoneValue || "")}" onchange="updateAdminPartnerEdit('${escapeHtml(partner.id)}', 'zone', this.value)" />
+        <label class="muted">Review notes</label>
+        <textarea rows="2" style="width:100%;border:1px solid #d1d5db;border-radius:12px;padding:11px;font-size:0.95rem;" onchange="updateAdminPartnerNote('${escapeHtml(partner.id)}', this.value)">${escapeHtml(noteValue)}</textarea>
+        ${Array.isArray(partner.statusHistory) && partner.statusHistory.length > 0 ? `
+          <div class="card muted" style="margin:0;">
+            ${partner.statusHistory.map((entry) => `
+              <div class="value-line">
+                <span>${escapeHtml(entry.status || "")}</span>
+                <span class="muted">${escapeHtml(entry.at || entry.createdAt || "")}</span>
+              </div>
+            `).join("")}
+          </div>
+        ` : ""}
+        <div class="row">
+          <button class="btn btn-outline btn-block" onclick='updateAdminPartnerStatus(${JSON.stringify(partner.id)}, "approved")' ${partner.status === "approved" || partner.status === "live" ? "disabled" : ""}>Approve</button>
+          <button class="btn btn-outline btn-block" onclick='updateAdminPartnerStatus(${JSON.stringify(partner.id)}, "rejected")' ${partner.status === "rejected" ? "disabled" : ""}>Reject</button>
+        </div>
+        <div class="row">
+          <button class="btn btn-outline btn-block" onclick='updateAdminPartnerStatus(${JSON.stringify(partner.id)}, "live")' ${partner.status === "live" ? "disabled" : ""}>Set Live</button>
+          <button class="btn btn-outline btn-block" onclick='updateAdminPartnerStatus(${JSON.stringify(partner.id)}, "suspended")' ${partner.status === "suspended" ? "disabled" : ""}>Suspend</button>
+        </div>
+      </div>
+    `;
+    }).join("")}
+    ${renderAdminBottomNav("admin_partners")}
+  `;
+}
+
 function renderPartnerDashboard() {
   const summary = partnerDashboard || {
     restaurantName: "Partner Restaurant",
@@ -2161,7 +2552,9 @@ function renderNotifications() {
         <div>${escapeHtml(item.message)}</div>
       </div>
     `).join("")}
-    ${isPartnerSession() ? renderPartnerBottomNav("notifications") : renderBottomNav("notifications")}
+    ${isAdminSession()
+      ? renderAdminBottomNav("notifications")
+      : (isPartnerSession() ? renderPartnerBottomNav("notifications") : renderBottomNav("notifications"))}
   `;
 }
 
@@ -2189,6 +2582,18 @@ function render() {
       break;
     case "support":
       app.innerHTML = renderSupport();
+      break;
+    case "partner_apply":
+      app.innerHTML = renderPartnerApplication();
+      break;
+    case "partner_apply_status":
+      app.innerHTML = renderPartnerApplicationStatus();
+      break;
+    case "admin_dashboard":
+      app.innerHTML = renderAdminDashboard();
+      break;
+    case "admin_partners":
+      app.innerHTML = renderAdminPartners();
       break;
     case "partner_dashboard":
       app.innerHTML = renderPartnerDashboard();
@@ -2218,12 +2623,14 @@ function navigate(route, data = {}) {
   clearError();
   render();
 
-  if (authToken && user) startLiveUpdates();
+  if (authToken && user && !isAdminSession()) startLiveUpdates();
   else stopLiveUpdates();
 
   if (route === "home") refreshListings();
   if (route === "reservations") refreshReservations();
   if (route === "support") refreshSupportData();
+  if (route === "admin_dashboard") refreshAdminPartners();
+  if (route === "admin_partners") refreshAdminPartners();
   if (route === "partner_dashboard") refreshPartnerDashboard();
   if (route === "partner_reservations") refreshPartnerReservations();
   if (route === "partner_ledger") refreshPartnerLedger();
@@ -2407,6 +2814,79 @@ async function refreshPartnerReservations(silent = false) {
   }
 }
 
+async function refreshAdminPartners(silent = false) {
+  if (!authToken) return;
+  if (isMockOtpModeEnabled()) {
+    seedMockAdminData();
+    clearError();
+    render();
+    return;
+  }
+  if (!silent) startBusy("Loading partner applications...");
+  try {
+    const response = await apiGetAdminPartners();
+    const rawPartners = Array.isArray(response.partners) ? response.partners : [];
+    adminPartners = rawPartners.map(mapAdminPartner);
+    clearError();
+  } catch (error) {
+    setError(`Could not load partner applications: ${error.message}`);
+  } finally {
+    if (!silent) stopBusy();
+    else render();
+  }
+}
+
+async function updateAdminPartnerStatus(partnerId, status) {
+  const nextStatus = String(status || "").toLowerCase();
+  if (!partnerId || !nextStatus) return;
+  const current = adminPartners.find((partner) => partner.id === partnerId);
+  const edit = getAdminPartnerEdit(partnerId);
+  const commissionPercent = edit ? Number(edit.commissionRate) : Number.NaN;
+  const note = adminPartnerNotes[partnerId] || current?.reviewNotes || "";
+  const payload = { status: nextStatus, reviewNotes: note };
+  if (!Number.isNaN(commissionPercent)) payload.commissionRate = commissionPercent / 100;
+  else if (current && typeof current.commissionRate === "number") payload.commissionRate = current.commissionRate;
+  if (edit && edit.payoutCycle) payload.payoutCycle = edit.payoutCycle;
+  else if (current && current.payoutCycle) payload.payoutCycle = current.payoutCycle;
+  if (edit && edit.zone) payload.zone = edit.zone;
+  else if (current && current.zone) payload.zone = current.zone;
+  if (isMockOtpModeEnabled()) {
+    adminPartners = adminPartners.map((partner) => {
+      if (partner.id !== partnerId) return partner;
+      return {
+        ...partner,
+        status: nextStatus,
+        commissionRate: payload.commissionRate ?? partner.commissionRate,
+        payoutCycle: payload.payoutCycle ?? partner.payoutCycle,
+        zone: payload.zone ?? partner.zone
+      };
+    });
+    if (adminPartnerEdits[partnerId]) delete adminPartnerEdits[partnerId];
+    if (adminPartnerNotes[partnerId]) delete adminPartnerNotes[partnerId];
+    syncPartnerApplicationStatus(partnerId, nextStatus);
+    addNotification("Partner status updated", `Partner ${partnerId} marked ${nextStatus}.`, "admin");
+    clearError();
+    render();
+    return;
+  }
+
+  startBusy("Updating partner status...");
+  try {
+    await apiUpdateAdminPartnerStatus(partnerId, payload);
+    await refreshAdminPartners(true);
+    if (adminPartnerEdits[partnerId]) delete adminPartnerEdits[partnerId];
+    if (adminPartnerNotes[partnerId]) delete adminPartnerNotes[partnerId];
+    syncPartnerApplicationStatus(partnerId, nextStatus);
+    addNotification("Partner status updated", `Partner ${partnerId} marked ${nextStatus}.`, "admin");
+    clearError();
+    render();
+  } catch (error) {
+    setError(`Partner update failed: ${error.message}`);
+  } finally {
+    stopBusy();
+  }
+}
+
 async function refreshPartnerLedger(silent = false) {
   if (!authToken) return;
   if (isMockOtpModeEnabled()) {
@@ -2434,6 +2914,186 @@ async function refreshPartnerLedger(silent = false) {
 
 function updatePartnerListingDraft(key, value) {
   state.partnerListingDraft[key] = value;
+}
+
+function updatePartnerApplicationDraft(key, value) {
+  state.partnerApplicationDraft[key] = value;
+}
+
+async function uploadPartnerDocument(file, docType) {
+  const payload = {
+    fileName: file.name,
+    contentType: file.type || "application/octet-stream",
+    docType
+  };
+  const response = await apiRequestUploadUrl(payload);
+  const uploadUrl = response.uploadUrl || response.url;
+  const fileUrl = response.fileUrl || response.publicUrl || response.url;
+  if (!uploadUrl || !fileUrl) throw new Error("Upload URL missing.");
+  await uploadFileToPresignedUrl(uploadUrl, file);
+  return {
+    type: docType,
+    name: file.name,
+    size: file.size,
+    url: fileUrl
+  };
+}
+
+function syncPartnerApplicationStatus(partnerId, status) {
+  if (!partnerApplication) return;
+  const sameId = String(partnerApplication.id || "") === String(partnerId || "");
+  if (!sameId) return;
+  partnerApplication.status = String(status || partnerApplication.status || "submitted").toLowerCase();
+  savePartnerApplication();
+}
+
+async function handlePartnerDocumentUpload(input) {
+  const file = input?.files && input.files[0] ? input.files[0] : null;
+  if (!file) return;
+  const typeEl = document.getElementById("partner-doc-type");
+  const docType = typeEl ? String(typeEl.value || "other") : "other";
+  startBusy("Uploading document...");
+  try {
+    const uploaded = await uploadPartnerDocument(file, docType);
+    const docs = Array.isArray(state.partnerApplicationDraft.documents)
+      ? state.partnerApplicationDraft.documents.slice()
+      : [];
+    docs.push(uploaded);
+    state.partnerApplicationDraft.documents = docs;
+    if (input) input.value = "";
+    clearError();
+    render();
+  } catch (error) {
+    setError(`Upload failed: ${error.message}`);
+  } finally {
+    stopBusy();
+  }
+}
+
+function removePartnerDocument(index) {
+  const docs = Array.isArray(state.partnerApplicationDraft.documents)
+    ? state.partnerApplicationDraft.documents.slice()
+    : [];
+  if (index < 0 || index >= docs.length) return;
+  docs.splice(index, 1);
+  state.partnerApplicationDraft.documents = docs;
+  render();
+}
+
+async function refreshPartnerApplicationStatus(silent = false) {
+  if (!authToken) return;
+  if (isMockOtpModeEnabled()) {
+    if (partnerApplication) savePartnerApplication();
+    if (!silent) render();
+    return;
+  }
+  if (!silent) startBusy("Checking partner application...");
+  try {
+    const response = await apiGetPartnerApplicationStatus();
+    const application = response.application || response.partner || response || null;
+    if (application) {
+      partnerApplication = {
+        id: application.id || partnerApplication?.id || "",
+        status: application.status || partnerApplication?.status || "submitted",
+        createdAt: application.createdAt || partnerApplication?.createdAt || new Date().toISOString(),
+        restaurantName: application.restaurantName || partnerApplication?.restaurantName || "",
+        ownerName: application.ownerName || partnerApplication?.ownerName || "",
+        phone: application.phone || partnerApplication?.phone || "",
+        email: application.email || partnerApplication?.email || "",
+        address: application.address || partnerApplication?.address || "",
+        city: application.city || partnerApplication?.city || "",
+        fssai: application.fssai || partnerApplication?.fssai || "",
+        payoutUpi: application.payoutUpi || partnerApplication?.payoutUpi || ""
+      };
+      savePartnerApplication();
+    }
+    clearError();
+  } catch (error) {
+    if (!silent) setError(`Could not load application status: ${error.message}`);
+  } finally {
+    if (!silent) stopBusy();
+    else render();
+  }
+}
+
+async function submitPartnerApplication() {
+  const draft = state.partnerApplicationDraft;
+  const payload = {
+    restaurantName: String(draft.restaurantName || "").trim(),
+    ownerName: String(draft.ownerName || "").trim(),
+    phone: String(draft.phone || state.pendingPhone || "").trim(),
+    email: String(draft.email || "").trim(),
+    address: String(draft.address || "").trim(),
+    city: String(draft.city || "").trim(),
+    fssai: String(draft.fssai || "").trim(),
+    payoutUpi: String(draft.payoutUpi || "").trim(),
+    documents: Array.isArray(draft.documents)
+      ? draft.documents.map((doc) => ({
+          type: doc.type,
+          name: doc.name,
+          size: doc.size,
+          url: doc.url
+        }))
+      : []
+  };
+
+  if (!payload.restaurantName || payload.restaurantName.length < 2) {
+    setError("Enter a valid restaurant name.");
+    return;
+  }
+  if (!payload.phone || payload.phone.length < 10) {
+    setError("Enter a valid phone number.");
+    return;
+  }
+  if (!payload.address || payload.address.length < 4) {
+    setError("Enter a valid address.");
+    return;
+  }
+  if (!payload.city || payload.city.length < 2) {
+    setError("Enter a city/zone.");
+    return;
+  }
+
+  if (isMockOtpModeEnabled()) {
+    partnerApplication = {
+      id: `APP-${String(Date.now()).slice(-5)}`,
+      status: "submitted",
+      createdAt: new Date().toISOString(),
+      ...payload
+    };
+    savePartnerApplication();
+    addNotification("Partner application submitted", "We will review and contact you shortly.", "partner");
+    clearError();
+    navigate("partner_apply_status");
+    return;
+  }
+
+  startBusy("Submitting partner application...");
+  try {
+    const response = await apiSubmitPartnerApplication(payload);
+    const application = response.application || response.partner || response || payload;
+    partnerApplication = {
+      id: application.id || `APP-${String(Date.now()).slice(-5)}`,
+      status: application.status || "submitted",
+      createdAt: application.createdAt || new Date().toISOString(),
+      restaurantName: application.restaurantName || payload.restaurantName,
+      ownerName: application.ownerName || payload.ownerName,
+      phone: application.phone || payload.phone,
+      email: application.email || payload.email,
+      address: application.address || payload.address,
+      city: application.city || payload.city,
+      fssai: application.fssai || payload.fssai,
+      payoutUpi: application.payoutUpi || payload.payoutUpi
+    };
+    savePartnerApplication();
+    addNotification("Partner application submitted", "We will review and contact you shortly.", "partner");
+    clearError();
+    navigate("partner_apply_status");
+  } catch (error) {
+    setError(`Application failed: ${error.message}`);
+  } finally {
+    stopBusy();
+  }
 }
 
 async function createPartnerListing() {
@@ -2666,11 +3326,13 @@ async function verifyOtp() {
       return;
     }
     state.sessionRole = isPartnerLoginMode() ? "partner" : "customer";
+    state.loginMode = normalizeLoginMode(state.sessionRole);
     authToken = "mock-token";
     user = {
       id: Date.now(),
       phone: state.pendingPhone,
-      name: isPartnerSession() ? "Mock Partner" : "Mock User"
+      name: isPartnerSession() ? "Mock Partner" : "Mock User",
+      role: state.sessionRole
     };
     if (isPartnerSession()) {
       seedMockPartnerData();
@@ -2696,14 +3358,19 @@ async function verifyOtp() {
     const response = await apiVerifyOtp(state.pendingPhone, otp, state.verificationId);
     authToken = response.token || "";
     if (!authToken) throw new Error("Token missing in response.");
-    state.sessionRole = isPartnerLoginMode() ? "partner" : "customer";
+    const resolvedRole = normalizeRole(response.user?.role || response.role);
+    state.sessionRole = resolvedRole;
+    state.loginMode = normalizeLoginMode(resolvedRole);
     user = {
       id: response.user?.id || Date.now(),
       phone: response.user?.phone || state.pendingPhone,
-      name: response.user?.name || (isPartnerSession() ? "Partner" : "User"),
-      restaurantId: response.user?.restaurantId || response.user?.restaurant?.id || null
+      name: response.user?.name || (resolvedRole === "partner" ? "Partner" : "User"),
+      restaurantId: response.user?.restaurantId || response.user?.restaurant?.id || null,
+      role: resolvedRole
     };
-    if (isPartnerSession()) {
+    if (resolvedRole === "admin") {
+      adminPartners = [];
+    } else if (isPartnerSession()) {
       await bootstrapPartnerSession();
       state.partnerListingDraft = createDefaultPartnerListingDraft();
     }
@@ -2714,21 +3381,22 @@ async function verifyOtp() {
       "auth"
     );
     clearError();
-    navigate(isPartnerSession() ? "partner_dashboard" : "home");
-    startLiveUpdates();
-    requestNativePushToken();
-    syncPushTokenWithBackend();
-    syncNotificationPreferencesToBackend();
-    if (!isPartnerSession()) refreshSupportData(true);
-  } catch (error) {
-    if (isPartnerSession()) {
-      clearSession();
-      state.loginMode = "partner";
-      state.sessionRole = "customer";
-      navigate("auth_phone");
-      setError(`Partner verification failed: ${error.message}`);
-      return;
+    navigate(
+      resolvedRole === "admin"
+        ? "admin_dashboard"
+        : (isPartnerSession() ? "partner_dashboard" : "home")
+    );
+    if (!isAdminSession()) {
+      startLiveUpdates();
+      requestNativePushToken();
+      syncPushTokenWithBackend();
+      syncNotificationPreferencesToBackend();
+      if (!isPartnerSession()) refreshSupportData(true);
+      refreshPartnerApplicationStatus(true);
+    } else {
+      refreshAdminPartners(true);
     }
+  } catch (error) {
     setError(`Verification failed: ${error.message}`);
   } finally {
     stopBusy();
@@ -3099,8 +3767,8 @@ function signOut() {
 }
 
 function init() {
-  const persistedRole = localStorage.getItem(STORAGE.sessionRole) === "partner" ? "partner" : "customer";
-  state.loginMode = persistedRole;
+  const persistedRole = normalizeRole(user?.role || localStorage.getItem(STORAGE.sessionRole));
+  state.loginMode = normalizeLoginMode(persistedRole);
   state.sessionRole = persistedRole;
 
   const onboarded = localStorage.getItem(STORAGE.onboarded) === "true";
@@ -3114,6 +3782,12 @@ function init() {
     render();
     return;
   }
+  if (isAdminSession()) {
+    state.route = "admin_dashboard";
+    render();
+    refreshAdminPartners(true);
+    return;
+  }
   if (isPartnerSession()) {
     state.route = "partner_dashboard";
     render();
@@ -3124,6 +3798,7 @@ function init() {
     refreshPartnerDashboard();
     refreshPartnerReservations(true);
     refreshPartnerLedger(true);
+    refreshPartnerApplicationStatus(true);
     return;
   }
   state.route = "home";
@@ -3135,6 +3810,7 @@ function init() {
   refreshListings();
   refreshReservations();
   refreshSupportData(true);
+  refreshPartnerApplicationStatus(true);
 }
 
 window.navigate = navigate;
@@ -3167,11 +3843,20 @@ window.toggleNotificationPreference = updateNotificationPreference;
 window.onNativeNotificationPermissionResult = onNativeNotificationPermissionResult;
 window.onNativePushToken = onNativePushToken;
 window.updatePartnerListingDraft = updatePartnerListingDraft;
+window.updatePartnerApplicationDraft = updatePartnerApplicationDraft;
+window.submitPartnerApplication = submitPartnerApplication;
+window.handlePartnerDocumentUpload = handlePartnerDocumentUpload;
+window.removePartnerDocument = removePartnerDocument;
+window.refreshPartnerApplicationStatus = refreshPartnerApplicationStatus;
 window.createPartnerListing = createPartnerListing;
 window.refreshPartnerDashboard = refreshPartnerDashboard;
 window.refreshPartnerReservations = refreshPartnerReservations;
 window.refreshPartnerLedger = refreshPartnerLedger;
+window.refreshAdminPartners = refreshAdminPartners;
 window.confirmPartnerPickup = confirmPartnerPickup;
 window.markPartnerReservationPayment = markPartnerReservationPayment;
+window.updateAdminPartnerStatus = updateAdminPartnerStatus;
+window.updateAdminPartnerEdit = updateAdminPartnerEdit;
+window.updateAdminPartnerNote = updateAdminPartnerNote;
 
 init();
