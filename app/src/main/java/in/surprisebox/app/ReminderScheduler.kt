@@ -1,7 +1,6 @@
 package `in`.surprisebox.app
 
 import android.Manifest
-import android.R
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -107,7 +106,7 @@ object ReminderScheduler {
         val text = "$bodyRestaurant pickup starts in 1 hour ($bodySlot)."
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_popup_reminder)
+            .setSmallIcon(R.drawable.ic_splash_logo)
             .setContentTitle("Pickup reminder")
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText(text))
